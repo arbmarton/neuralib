@@ -51,57 +51,56 @@ Layer::Layer(const nlohmann::json& input)
 	, delta(input["delta"].get<nlohmann::json>())
 	, costWeight(input["costweight"].get<nlohmann::json>())
 {
-	std::string layer = input["layertype"].get<std::string>();
-	std::string neuron = input["neurontype"].get<std::string>();
-
-	if (layer == "input") {
-		layertype = LayerType::Input;
-	}
-	else if (layer == "general") {
-		layertype = LayerType::General;
-	}
-	else if (layer == "output") {
-		layertype = LayerType::Output;
-	}
-	else {
-		throw NeuralException("Cannot parse layertype from json file...");
-	}
-
-	if (neuron == "input") {
-		neurontype = NeuronType::Input;
-	}
-	else if (neuron == "sigmoid") {
-		neurontype = NeuronType::Sigmoid;
-	}
-	else if (neuron == "output") {
-		neurontype = NeuronType::Output;
-	}
-	else {
-		throw NeuralException("Cannot parse neurontype from json file...");
-	}
-
 	neurons.resize(size);
-	switch (neurontype)
+
+	switch (str2int(input["layertype"].get<std::string>().c_str()))
 	{
-	case NeuronType::Input:
+	case str2int("input"):
+		layertype = LayerType::Input;
+		break;
+
+	case str2int("general"):
+		layertype = LayerType::General;
+		break;
+
+	case str2int("output"):
+		layertype = LayerType::Output;
+		break;
+
+	default:
+		throw NeuralException("Cannot parse layertype from json file...");
+		break;
+	}
+
+	switch (str2int(input["neurontype"].get<std::string>().c_str()))
+	{
+	case str2int("input"):
+		neurontype = NeuronType::Input;
+
 		for (int i = 0; i < size; ++i) {
 			neurons[i] = new InputNeuron();
 		}
 		break;
 
-	case NeuronType::Sigmoid:
+	case str2int("sigmoid"):
+		neurontype = NeuronType::Sigmoid;
+
 		for (int i = 0; i < size; ++i) {
 			neurons[i] = new Sigmoid();
 		}
 		break;
 
-	case NeuronType::Output:
+	case str2int("output"):
+		neurontype = NeuronType::Output;
+
 		for (int i = 0; i < size; ++i) {
 			neurons[i] = new Sigmoid();
 		}
+		break;
 
 	default:
-		std::fill(neurons.begin(), neurons.end(), nullptr);
+		throw NeuralException("Cannot parse neurontype from json file...");
+		//std::fill(neurons.begin(), neurons.end(), nullptr);
 		break;
 	}
 }
