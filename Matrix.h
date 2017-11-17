@@ -7,8 +7,6 @@
 #include <random>
 #include <thread>
 
-//const int totalThreads = std::thread::hardware_concurrency();
-
 #define totalThreads std::thread::hardware_concurrency();
 
 template<class T>
@@ -123,16 +121,12 @@ public:
 		}*/
 
 		for (int i = 0; i < temp.getRows(); ++i) {
-			//std::cout << "i :" << i << '\n';
 			for (int j = 0; j < temp.getCols(); ++j) {
 				T accum = T(0);
 
 				for (int k = 0; k < m; ++k) {
 					accum += data[i*m + k]*rhs(k, j);
 				}
-
-				if (isnan(accum))
-					throw NeuralException("NaN encountered...");
 
 				temp(i, j) = accum;
 			}
@@ -298,7 +292,6 @@ private:
 		Matrix& result) const
 	{
 		for (int i = 0; i < left.getRows(); ++i) {
-			//if (threadID == 1) std::cout << "i: " << i << '\n';
 
 			for (int j = threadID; j < right.getCols(); j+=totalThreads) {
 				T accum = T(0);
