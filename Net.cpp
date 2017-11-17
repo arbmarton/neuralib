@@ -2,15 +2,8 @@
 #include "Net.h"
 
 
-Net::Net(
-	const int&        epochNumber,
-	const int&        minibatchSizeParam,
-	const float&      newEta,
-	NeuralInputClass* input)
-	: epochs(epochNumber)
-	, minibatchSize(minibatchSizeParam)
-	, eta(newEta)
-	, inputClass(input)
+Net::Net(NeuralInputClass* input)
+	: inputClass(input)
 	, threads(std::thread::hardware_concurrency())
 {
 	input->init();
@@ -169,8 +162,15 @@ void Net::connectLayers()
 	}
 }
 
-void Net::calculate()
+void Net::train(
+	const int&        epochNumber,
+	const int&        minibatchSizeParam,
+	const float&      newEta)
 {
+	epochs = epochNumber;
+	minibatchSize = minibatchSizeParam;
+	eta = newEta;
+
 	std::cout << "Starting calculations...\n";
 	printLayerInfo();
 
@@ -217,9 +217,11 @@ void Net::calculate()
 			<< ", the ratio is: "<< dynamic_cast<OutputLayer*>(getLastLayer())->getRatio() << '\n';
 		//printOutputLayer();
 	}
+}
 
-	
-	
+void Net::work()
+{
+
 }
 
 void Net::calculateActivationInAllLayers() const
@@ -262,7 +264,7 @@ void Net::updateWeightsAndBiases(
 {
 	for (int i = 0; i < layers.size(); ++i) {
 		if (dynamic_cast<InputLayer*> (layers[i])) continue;
-		if (dynamic_cast<OutputLayer*>(layers[i])) continue;  //why in the everloving fuck do i need this?
+		if (dynamic_cast<OutputLayer*>(layers[i])) continue;
 
 		layers[i]->update(weights[i], biases[i], multiplier);
 	}
@@ -320,6 +322,13 @@ nlohmann::json Net::toJSON() const
 	ret["layers"] = jsonLayers;
 
 	return ret;
+}
+
+void Net::saveAs(const char* filename) const
+{
+	std::ofstream o(filename);
+	o << toJSON();
+	o.close();
 }
 
 Net::~Net()

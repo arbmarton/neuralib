@@ -10,6 +10,7 @@
 #include <iostream>
 #include <assert.h>
 #include <thread>
+#include <fstream>
 
 //when constructing a net from json, the layers should be connected manually
 
@@ -17,11 +18,7 @@
 class Net
 {
 public:
-	Net(const int&        epochNumber,
-		const int&		  minibatchSizeParam,
-		const float&	  newEta,
-		NeuralInputClass* inputMaker);
-
+	Net(NeuralInputClass* inputMaker);
 	Net(const nlohmann::json& input);
 
 	void createNewLayer(
@@ -36,7 +33,12 @@ public:
 
 	void addInputClass(NeuralInputClass* inputclass);
 
-	void calculate();
+	void train(
+		const int&        epochNumber,
+		const int&        minibatchSizeParam,
+		const float&      newEta);
+	void work();
+
 	void calculateActivationInAllLayers() const;
 	void calculateDeltaInAllLayers() const;
 	void calculateDerivativesInAllLayers() const;  // invoke after delta calculation only
@@ -53,9 +55,11 @@ public:
 	void printLayerInfo() const;
 
 	nlohmann::json toJSON() const;
+	void saveAs(const char* filename) const;
 
 	~Net();
 private:
+	// maybe these shouldnt be members, do i need these to get written out when saving?
 	int   epochs;
 	int	  minibatchSize;
 	float eta;
@@ -69,3 +73,11 @@ private:
 	unsigned int threads;
 };
 
+// less typing when constructing a Net from a json
+inline nlohmann::json getJson(const char* filename)
+{
+	std::ifstream i(filename);
+	nlohmann::json readjson;
+	i >> readjson;
+	return readjson;
+}
