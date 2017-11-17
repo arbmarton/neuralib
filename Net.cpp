@@ -213,7 +213,7 @@ void Net::calculate()
 			updateWeightsAndBiases(weightUpdater, biasUpdater, eta / float(minibatchSize));
 			//printOutputLayer();
 		}
-		std::cout << "After epoch number " << epochCounter 
+		std::cout << "After epoch number " << epochCounter + 1 
 			<< ", the ratio is: "<< dynamic_cast<OutputLayer*>(getLastLayer())->getRatio() << '\n';
 		//printOutputLayer();
 	}
