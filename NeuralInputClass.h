@@ -54,4 +54,3 @@ private:
 
 	void imageToLayer(std::vector<Neuron*>& input);
 };
-
