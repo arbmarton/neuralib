@@ -311,8 +311,6 @@ InputLayer::InputLayer(
 	for (int i = 0; i < neurons.size(); ++i) {
 		neurons[i] = new InputNeuron();
 	}
-
-	//func(neurons);
 }
 
 InputLayer::InputLayer(const nlohmann::json& input)
@@ -328,7 +326,6 @@ void InputLayer::setInputFunction(const std::function<void(std::vector<Neuron*>&
 
 void InputLayer::calculateActivation()
 {
-	//783
 	inputFunction(neurons);
 
 	for (int i = 0; i < activations.getRows(); ++i) {
@@ -345,13 +342,6 @@ void InputLayer::printLayerInfo() const
 	std::cout << "Layertype: " + type + "\nNeurontype: " + _neurontype + "\nLayersize: " +  size << "\n\n";
 }
 
-//nlohmann::json InputLayer::toJSON()
-//{
-//	nlohmann::json ret = dynamic_cast<Layer*>(this)->toJSON();
-//
-//	ret["layertype"] = "input";
-//}
-
 InputLayer::~InputLayer()
 {
 
@@ -365,7 +355,6 @@ OutputLayer::OutputLayer(
 	Layer* _next)
 	: Layer(newSize, newNeuronType, LayerType::Output, previous, _next)
 	, idealOutputFunction(func)
-//	, cost(Matrix<float>(0,0))
 	, correct(0)
 	, notCorrect(0)
 {
@@ -397,22 +386,6 @@ Matrix<float> OutputLayer::getIdealOutput() const
 	return Matrix<float>(vec);
 }
 
-//void OutputLayer::calculateActivation()
-//{
-//	auto temp = weights * (prev->getActivations());
-//	//temp += biases;
-//
-//	zed = temp + biases;
-//
-//	for (int i = 0; i < activations.getRows(); ++i) {
-//		//activations(i, 0) = 1 / (1 + exp(-temp(i, 0)));
-//		activations(i, 0) = sigmoid(-zed(i, 0));
-//
-//		neurons[i]->setResult(activations(i, 0));
-//	}
-//
-//	
-//}
 
 void OutputLayer::calculateDelta()
 {
@@ -425,10 +398,7 @@ void OutputLayer::calculateDelta()
 	delta = hadamardProduct(
 		sigmoidDerivative(zed),
 		activations - getIdealOutput()
-		//getIdealOutput() - activations
 	);
-
-	//delta.print();
 }
 
 void OutputLayer::initBiases()

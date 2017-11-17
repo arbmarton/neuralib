@@ -106,8 +106,6 @@ public:
 
 	void printLayerInfo() const override;
 
-	//nlohmann::json toJSON();
-
 	~InputLayer();
 private:
 	std::function<void(std::vector<Neuron*>&)> inputFunction;
@@ -129,7 +127,6 @@ public:
 	void setIdealOutput(const std::function<void(std::vector<float>&)>& func);
 
 	Matrix<float> getIdealOutput() const;
-	//void calculateActivation() override;
 	void calculateDelta() override;
 
 	void resetCounters() { correct = 0; notCorrect = 0; }
@@ -137,13 +134,9 @@ public:
 
 	void printLayerInfo() const override;
 
-	//nlohmann::json toJSON() const override;
-
 	~OutputLayer();
 private:
 	std::function<void(std::vector<float>&)> idealOutputFunction;
-
-	//Matrix<float> cost;
 
 	int correct;
 	int notCorrect;
