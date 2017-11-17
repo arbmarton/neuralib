@@ -238,9 +238,6 @@ void Net::calculateDeltaInAllLayers() const
 
 void Net::calculateDerivativesInAllLayers() const
 {
-	/*for (Layer* layer : layers) {
-		layer->calculateCostWeight();
-	}*/
 	for (int i = layers.size() - 1; i >= 0; --i) {  // inputlayer wont do anything, we can include it
 		layers[i]->calculateCostWeight();
 	}
