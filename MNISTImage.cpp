@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MNISTImage.h"
 
-
+// copied from stackoverflow
 int reverseInt(const int& i)
 {
 	unsigned char c1, c2, c3, c4;
@@ -42,30 +42,22 @@ ImageHolder::ImageHolder(const int& imagesToRead)
 	file.read((char*)&n_cols, sizeof(n_cols));
 	n_cols = reverseInt(n_cols);
 
-	//std::cout << magic_number << ' ' << number_of_images << ' ' << n_rows << ' ' << n_cols << '\n';
-
 	number_of_images = imagesToRead;
 
-	/*std::vector<MNISTImage*> images;
-	images.resize(number_of_images);*/
 
 	for (int i = 0; i < number_of_images; ++i) {
-		//images[i] = new MNISTImage(n_rows, n_cols);
 		pairs[i].first = new MNISTImage(n_rows, n_cols);
 
 		for (int j = 0; j < n_rows; ++j) {
 			for (int k = 0; k < n_cols; ++k) {
 				unsigned char input;
 				file.read((char*)&input, sizeof(input));
-				//images[i]->data[j*n_cols + k] = input;
 				pairs[i].first->data[j*n_cols + k] = input;
 
 				//file.read((char*)images[i]->data[j*n_cols + k], sizeof(unsigned char));  // why is this not working?
 			}
 		}
 	}
-
-	//MNISTimages = images;
 
 	std::ifstream fileLabels("train-labels.idx1-ubyte", std::ios::binary | std::ios::in);
 	if (!file.is_open()) {
@@ -80,16 +72,11 @@ ImageHolder::ImageHolder(const int& imagesToRead)
 
 	number_of_images = imagesToRead;
 
-	//std::vector<short> labelsTemp;
-	//labelsTemp.resize(number_of_images);
 	for (int i = 0; i < number_of_images; ++i) {
 		unsigned char input;
 		fileLabels.read((char*)&input, sizeof(input));
-		//labelsTemp[i] = unsigned short(input);
 		pairs[i].second = unsigned short(input);
 	}
-
-	//labels = labelsTemp;
 
 	auto rng = std::default_random_engine{};
 	std::shuffle(std::begin(pairs), std::end(pairs), rng);
