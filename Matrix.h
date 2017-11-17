@@ -27,6 +27,9 @@ public:
 		, m(cols)
 		, data(new T[rows*cols])
 	{		
+		if (rows < 0 || cols < 0)
+			throw NeuralException("Matrix sizes cant be negative...");
+
 		memset(data, T(0), sizeof(T)*rows*cols);
 	}
 
