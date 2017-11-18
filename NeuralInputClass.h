@@ -12,6 +12,8 @@ class NeuralInputClass
 public:
 	NeuralInputClass();
 
+	virtual int getTotalSize() const = 0;
+
 	virtual void init() {};
 
 	virtual void shuffle() {};
@@ -41,16 +43,39 @@ public:
 	void shuffle() override { images->shuffle(); }
 	void resetCounter() override { images->curr = 0; }
 
-	int getTotalImages() const { return totalImages; }
+	virtual int getTotalSize() const { return totalImages; }
 	ImageHolder* getImageHolder() const { return images; }
 
-	std::function<void(std::vector<Neuron*>&)> getInputFunction();    
-	std::function<void(std::vector<float>&)>   getOutputFunction();
+	std::function<void(std::vector<Neuron*>&)> getInputFunction() override;    
+	std::function<void(std::vector<float>&)>   getOutputFunction() override;
 
 	~MNISTInputClass();
 private:
 	int			  totalImages;
 	ImageHolder*  images;
 
-	void imageToLayer(std::vector<Neuron*>& input);
+	void imageToLayer(std::vector<Neuron*>& input) const;
+};
+
+
+class BitXORInputClass : public NeuralInputClass
+{
+public:
+	BitXORInputClass(const int& testCount);
+
+	virtual int getTotalSize() const { return testCaseCount; }
+
+	void init() override;
+
+	void shuffle() override;
+	void resetCounter() override;
+
+	std::function<void(std::vector<Neuron*>&)> getInputFunction() override;
+	std::function<void(std::vector<float>&)>   getOutputFunction() override;
+
+	~BitXORInputClass() {};
+private:
+	int								   curr;
+	int								   testCaseCount;
+	std::vector<std::pair<bool, bool>> trainingData;
 };
