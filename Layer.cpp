@@ -350,6 +350,7 @@ InputLayer::~InputLayer()
 OutputLayer::OutputLayer(
 	const int& newSize,
 	const NeuronType& newNeuronType,
+	const CostFunction& costType,
 	const std::function<void(std::vector<float>&)>& func,
 	Layer* previous,
 	Layer* _next)
@@ -370,7 +371,20 @@ OutputLayer::OutputLayer(
 OutputLayer::OutputLayer(const nlohmann::json& input)
 	: Layer(input)
 {
+	switch (str2int(input["costfunction"].get<std::string>().c_str()))
+	{
+	case str2int("leastsquares"):
+		costFunctionType = CostFunction::LeastSquares;
+		break;
 
+	case str2int("crossentropy"):
+		costFunctionType = CostFunction::CrossEntropy;
+		break;
+
+	default:
+		throw NeuralException("Cant parse costfunction type...");
+		break;
+	}
 }
 
 void OutputLayer::setIdealOutput(const std::function<void(std::vector<float>&)>& func)
@@ -389,15 +403,31 @@ Matrix<float> OutputLayer::getIdealOutput() const
 
 void OutputLayer::calculateDelta()
 {
-	auto mat = getIdealOutput().largestIndex();
-	if (mat == activations.largestIndex())
+	int index = getIdealOutput().largestIndex();
+	if (index == activations.largestIndex())
 		correct++;
 	else
 		notCorrect++;
 
+	Matrix<float> difference;
+	switch (costFunctionType)
+	{
+	case CostFunction::LeastSquares:
+		difference = activations - getIdealOutput();
+		break;
+
+	case CostFunction::CrossEntropy:
+
+		break;
+
+	default:
+		throw NeuralException("Invalid costfunction type...");
+		break;
+	}
+
 	delta = hadamardProduct(
 		sigmoidDerivative(zed),
-		activations - getIdealOutput()
+		difference
 	);
 }
 
@@ -424,6 +454,77 @@ void OutputLayer::printLayerInfo() const
 	std::string size = std::to_string(neurons.size());
 
 	std::cout << "Layertype: " + type + "\nNeurontype: " + _neurontype + "\nLayersize: " + size << "\n\n";
+}
+
+nlohmann::json OutputLayer::toJSON() const
+{
+	nlohmann::json ret;
+
+	ret["size"] = size;
+
+	switch (layertype)
+	{
+	case LayerType::Input:
+		ret["layertype"] = "input";
+		break;
+
+	case LayerType::General:
+		ret["layertype"] = "general";
+		break;
+
+	case LayerType::Output:
+		ret["layertype"] = "output";
+		break;
+
+	default:
+		ret["layertype"] = "unknown";
+		break;
+	}
+
+	switch (neurontype)
+	{
+	case NeuronType::Input:
+		ret["neurontype"] = "input";
+		break;
+
+	case NeuronType::Sigmoid:
+		ret["neurontype"] = "sigmoid";
+		break;
+
+	case NeuronType::Output:
+		ret["neurontype"] = "output";
+		break;
+
+	default:
+		ret["neurontype"] = "unknown";
+		break;
+	}
+
+	switch (costFunctionType)
+	{
+	case CostFunction::LeastSquares:
+		ret["costfunction"] = "leastsquares";
+		break;
+
+	case CostFunction::CrossEntropy:
+		ret["costfunction"] = "crossentropy";
+		break;
+
+	default:
+		ret["costfunction"] = "unknown";
+		break;
+	}
+
+	//?? neurons?
+
+	ret["activations"] = activations.toJSON();
+	ret["weights"] = weights.toJSON();
+	ret["biases"] = biases.toJSON();
+	ret["zed"] = zed.toJSON();
+	ret["delta"] = delta.toJSON();
+	ret["costweight"] = costWeight.toJSON();
+
+	return ret;
 }
 
 OutputLayer::~OutputLayer()

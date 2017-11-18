@@ -111,12 +111,15 @@ private:
 	std::function<void(std::vector<Neuron*>&)> inputFunction;
 };
 
+
+//update json
 class OutputLayer : public Layer
 {
 public:
 	OutputLayer(
 		const int& newSize,
 		const NeuronType& newNeuronType,
+		const CostFunction& costType,
 		const std::function<void(std::vector<float>&)>& func,
 		Layer* previous = nullptr,
 		Layer* _next = nullptr
@@ -134,8 +137,11 @@ public:
 
 	void printLayerInfo() const override;
 
+	nlohmann::json toJSON() const override;
+
 	~OutputLayer();
 private:
+	CostFunction costFunctionType = CostFunction::LeastSquares;
 	std::function<void(std::vector<float>&)> idealOutputFunction;
 
 	int correct;
