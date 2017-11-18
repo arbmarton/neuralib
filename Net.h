@@ -4,6 +4,7 @@
 #include "Neuron.h"
 #include "NeuralException.h"
 #include "NeuralInputClass.h"
+#include "NeuralMath.h"
 
 #include "json.hpp"
 
@@ -18,7 +19,7 @@
 class Net
 {
 public:
-	Net(NeuralInputClass* inputMaker);
+	Net(NeuralInputClass* inputMaker, const CostFunction& cost = CostFunction::LeastSquares);
 	Net(const nlohmann::json& input);
 
 	void createNewLayer(
@@ -65,6 +66,7 @@ private:
 	float eta;
 
 	NeuralInputClass* inputClass;
+	CostFunction	  costFunction;
 
 	std::vector<Layer*> layers;
 

@@ -2,8 +2,9 @@
 #include "Net.h"
 
 
-Net::Net(NeuralInputClass* input)
+Net::Net(NeuralInputClass* input, const CostFunction& cost)
 	: inputClass(input)
+	, costFunction(cost)
 	, threads(std::thread::hardware_concurrency())
 {
 	input->init();
@@ -77,6 +78,7 @@ void Net::createNewLayer(const int& size, const NeuronType& neuronType, const La
 			new OutputLayer(
 				size,
 				neuronType,
+				costFunction,
 				inputClass->getOutputFunction(),
 				layers[layers.size() - 1]
 			)
@@ -174,7 +176,7 @@ void Net::train(
 	std::cout << "Starting calculations...\n";
 	printLayerInfo();
 
-	int minibatchNumber = dynamic_cast<MNISTInputClass*>(inputClass)->getTotalImages() / minibatchSize;
+	int minibatchNumber = inputClass->getTotalSize() / minibatchSize;
 
 	std::cout << "Network parameters:\nEpoch count: " << epochs 
 		<< "\nMinibatch size: " << minibatchSize << "\nEta: " << eta << "\n\n";
@@ -212,9 +214,12 @@ void Net::train(
 
 			updateWeightsAndBiases(weightUpdater, biasUpdater, eta / float(minibatchSize));
 			//printOutputLayer();
+			
 		}
+		
 		std::cout << "After epoch number " << epochCounter + 1 
 			<< ", the ratio is: "<< dynamic_cast<OutputLayer*>(getLastLayer())->getRatio() << '\n';
+		//std::cout << layers[1]->getCostWeight();
 		//printOutputLayer();
 	}
 }
