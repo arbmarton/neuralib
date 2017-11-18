@@ -239,7 +239,7 @@ public:
 		if (m != 1)
 			throw NeuralException("Apply to column vectors only...");
 
-		int ret = -1;
+		int ret = 0;
 		T largest = 0;
 		for (int i = 0; i < n; ++i) {
 			if (data[i] > largest) {
