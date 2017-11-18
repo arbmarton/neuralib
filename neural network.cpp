@@ -17,35 +17,40 @@
 #include <fstream>
 #include <thread>
 
-using json = nlohmann::json;
+//using json = nlohmann::json;
+
+#define json nlohmann::json
 
 int main()
 {
 	MNISTInputClass input(1000);
+	BitXORInputClass bit(1000);
 
 	try {
 
-		Net network(10, 10, 3.0f, &input);
-		network.createNewLayer(784,  NeuronType::Input,   LayerType::Input );
-		network.createNewLayer(30,   NeuronType::Sigmoid, LayerType::General);
-		network.createNewLayer(10,   NeuronType::Sigmoid, LayerType::Output);
+		//Net network(&input);
+		//network.createNewLayer(784,  NeuronType::Input,   LayerType::Input );
+		//network.createNewLayer(30,   NeuronType::Sigmoid, LayerType::General);
+		//network.createNewLayer(10,   NeuronType::Sigmoid, LayerType::Output);
 
-		network.calculate();
+		//network.train(10, 10, 3.0f);
 
-		json netJSON = network.toJSON();
+		//network.saveAs("net.json");
 
-		std::ofstream o("net.json");
-		o << netJSON;
-		o.close();
+		//Net cpy(getJson("net.json"));
+		//cpy.addInputClass(&input);
 
-		json readfile;
-		std::ifstream i("net.json");
-		i >> readfile;
+		//cpy.train(10, 5, 2.0f);
+		
 
-		Net cpy(readfile);
-		cpy.addInputClass(&input);
+		Net bitnet(&bit);
+		bitnet.createNewLayer(2,  NeuronType::Input,   LayerType::Input);
+		bitnet.createNewLayer(10,  NeuronType::Sigmoid, LayerType::General);
+		bitnet.createNewLayer(2,  NeuronType::Sigmoid, LayerType::Output);
 
-		cpy.calculate();
+		bitnet.train(1000, 10, 0.1f);
+
+		bitnet.saveAs("XOR.json");
 	}
 	catch (const NeuralException& exc) {
 		std::cout << exc.getErrorMessage() << '\n';
