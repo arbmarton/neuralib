@@ -4,6 +4,11 @@
 
 #include <math.h>
 
+enum class CostFunction {
+	LeastSquares,
+	CrossEntropy
+};
+
 template<class T>
 float sigmoid(const T& input)
 {
@@ -52,6 +57,12 @@ Matrix<T> sigmoidDerivative(const Matrix<T>& input)
 	}
 
 	return ret;
+}
+
+template<class T>
+Matrix<T> crossEntropy(const Matrix<T>& input)
+{
+	
 }
 
 // basically a string to int hash function for switching
