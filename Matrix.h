@@ -175,6 +175,12 @@ public:
 		return *this;
 	}
 
+	void fillValue(const float& val) {
+		for (int i = 0; i < n*m; ++i) {
+			data[i] = val;
+		}
+	}
+
 	void fillRand(const float& low, const float& high) {
 		std::random_device rd;
 		std::mt19937 rng(rd());
@@ -192,6 +198,16 @@ public:
 
 		for (int i = 0; i < n*m; ++i) {
 			data[i] = uni(rng);
+		}
+	}
+
+	void fillGaussNormalized(const float& mean, const float& sigma, const int& connections) {
+		std::random_device rd;
+		std::mt19937 rng(rd());
+		std::normal_distribution<float> uni(mean, sigma);
+
+		for (int i = 0; i < n*m; ++i) {
+			data[i] = uni(rng) / sqrt(float(connections));
 		}
 	}
 
