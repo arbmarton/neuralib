@@ -38,8 +38,10 @@ Layer::Layer(
 		break;
 	}
 
-	initWeights();
-	initBiases();
+	if (newLayerType != LayerType::Input) {
+		initWeights();
+		initBiases();
+	}
 }
 
 Layer::Layer(const nlohmann::json& input)
@@ -229,12 +231,14 @@ void Layer::printLayerInfo() const
 
 void Layer::initWeights()
 {
-	weights.fillGauss(0, 1);
+	//weights.fillGauss(0, 1);
+	weights.fillGaussNormalized(0, 1, prev->getSize());
 }
 
 void Layer::initBiases()
 {
-	biases.fillGauss(0, 1);
+	//biases.fillGauss(0, 1);
+	biases.fillGaussNormalized(0, 1, prev->getSize());
 }
 
 nlohmann::json Layer::toJSON() const
@@ -356,6 +360,7 @@ OutputLayer::OutputLayer(
 	Layer* _next)
 	: Layer(newSize, newNeuronType, LayerType::Output, previous, _next)
 	, idealOutputFunction(func)
+	, costFunctionType(costType)
 	, correct(0)
 	, notCorrect(0)
 {
@@ -409,15 +414,20 @@ void OutputLayer::calculateDelta()
 	else
 		notCorrect++;
 
-	Matrix<float> difference;
+	//Matrix<float> difference;
 	switch (costFunctionType)
 	{
 	case CostFunction::LeastSquares:
-		difference = activations - getIdealOutput();
+		//difference = activations - getIdealOutput();
+
+		delta = hadamardProduct(
+			sigmoidDerivative(zed),
+			activations - getIdealOutput()
+		);
 		break;
 
 	case CostFunction::CrossEntropy:
-
+		delta = activations - getIdealOutput();
 		break;
 
 	default:
@@ -425,10 +435,6 @@ void OutputLayer::calculateDelta()
 		break;
 	}
 
-	delta = hadamardProduct(
-		sigmoidDerivative(zed),
-		difference
-	);
 }
 
 void OutputLayer::initBiases()

@@ -141,7 +141,7 @@ public:
 
 	~OutputLayer();
 private:
-	CostFunction costFunctionType = CostFunction::LeastSquares;
+	CostFunction costFunctionType;
 	std::function<void(std::vector<float>&)> idealOutputFunction;
 
 	int correct;
