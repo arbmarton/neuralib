@@ -1,13 +1,12 @@
 #pragma once
 
 #include "json.hpp"
+#include "ThreadPool.h"
 
 #include <memory>
 #include <iostream>
 #include <random>
 #include <thread>
-
-#define totalThreads std::thread::hardware_concurrency();
 
 template<class T>
 class Matrix
@@ -82,8 +81,10 @@ public:
 
 		n = other.n;
 		m = other.m;
+
 		data = other.data;
 		other.data = nullptr;
+
 		return *this;
 	}
 
@@ -114,27 +115,34 @@ public:
 
 		Matrix temp(n, rhs.m);
 
-		/*std::vector<std::thread> threads;
-		for (int i = 0; i < totalThreads; ++i) {
-			threads.push_back(std::thread(&Matrix::subMatrixMult, this, i, *this, rhs, temp));
+		// if the matrix is larger than a certain number use multithreading
+		if (temp.getCols() * temp.getRows() > 100) {
+
+			std::vector<std::future<void>> fut;
+			for (int i = 0; i < TPool::getThreads(); ++i) {
+				fut.emplace_back(TPool::getThreadPool().enqueue(getLambda(), this, &rhs, i, TPool::getThreads(), &temp));
+			}
+
+			// this is needed so the stack frame wont get destroyed while the calculations are still running
+			for (int i = 0; i < fut.size(); ++i) {
+				fut[i].get();
+			}
+
 		}
+		else {
+			for (int i = 0; i < temp.getRows(); ++i) {
+				for (int j = 0; j < temp.getCols(); ++j) {
+					T accum = T(0);
 
-		for (int i = 0; i < totalThreads; ++i) {
-			threads[i].join();
-		}*/
+					for (int k = 0; k < m; ++k) {
+						accum += data[i*m + k] * rhs(k, j);
+					}
 
-		for (int i = 0; i < temp.getRows(); ++i) {
-			for (int j = 0; j < temp.getCols(); ++j) {
-				T accum = T(0);
-
-				for (int k = 0; k < m; ++k) {
-					accum += data[i*m + k]*rhs(k, j);
+					temp(i, j) = accum;
 				}
-
-				temp(i, j) = accum;
 			}
 		}
-
+		
 		*this = temp;
 		return *this;
 	}
@@ -308,20 +316,50 @@ private:
 		const int& threadID,
 		const Matrix& left,
 		const Matrix& right,
-		Matrix& result) const
+		Matrix* result) const
 	{
 		for (int i = 0; i < left.getRows(); ++i) {
 
-			for (int j = threadID; j < right.getCols(); j+=totalThreads) {
+			for (int j = threadID; j < right.getCols(); j += Nthreads) {
 				T accum = T(0);
 
 				for (int k = 0; k < left.getCols(); ++k) {
 					accum += left(i, k)*right(k, j);
 				}
 
-				result(i, j) = accum;
+				(*result)(i, j) = accum;
 			}
 		}
+	}
+
+	std::function<void(
+		const Matrix<float>* const left,
+		const Matrix<float>* const right,
+		const int start,
+		const int increment,
+		Matrix<float>* result)> getLambda()
+	{
+		auto lambda = [](
+			const Matrix<float>* const left,
+			const Matrix<float>* const right,
+			const int start,
+			const int increment,
+			Matrix<float>* result
+			) -> void
+		{
+			for (int i = start; i < result->getRows(); i += increment) {
+				for (int j = 0; j < result->getCols(); ++j) {
+					T accum = T(0);
+
+					for (int k = 0; k < left->getCols(); ++k) {
+						accum += (*left)(i, k) * (*right)(k, j);
+					}
+
+					(*result)(i, j) = accum;
+				}
+			}
+		};
+		return lambda;
 	}
 };
 
