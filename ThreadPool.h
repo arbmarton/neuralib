@@ -110,7 +110,7 @@ inline ThreadPool::~ThreadPool()
 
 
 // singleton wrapper around a ThreadPool object
-class TPool {
+class ThreadPoolWrapper {
 public:
 	static ThreadPool& getThreadPool() {
 
@@ -126,14 +126,11 @@ public:
 	}
 
 private:
-	TPool()
-	{
-	}
-
-	TPool(const TPool& other) = delete;
-	TPool(TPool&& other) = delete;
-	TPool& operator=(const TPool& other) = delete;
-	TPool& operator=(TPool&& other) = delete;
+	ThreadPoolWrapper() = delete;
+	ThreadPoolWrapper(const ThreadPoolWrapper& other) = delete;
+	ThreadPoolWrapper(ThreadPoolWrapper&& other) = delete;
+	ThreadPoolWrapper& operator=(const ThreadPoolWrapper& other) = delete;
+	ThreadPoolWrapper& operator=(ThreadPoolWrapper&& other) = delete;
 };
 
 

@@ -119,8 +119,12 @@ public:
 		if (temp.getCols() * temp.getRows() > 100) {
 
 			std::vector<std::future<void>> fut;
-			for (int i = 0; i < TPool::getThreads(); ++i) {
-				fut.emplace_back(TPool::getThreadPool().enqueue(getLambda(), this, &rhs, i, TPool::getThreads(), &temp));
+			for (int i = 0; i < ThreadPoolWrapper::getThreads(); ++i) {
+				fut.emplace_back(
+					ThreadPoolWrapper::getThreadPool().enqueue(
+						getLambda(), this, &rhs, i, ThreadPoolWrapper::getThreads(), &temp
+					)
+				);
 			}
 
 			// this is needed so the stack frame wont get destroyed while the calculations are still running
@@ -460,7 +464,7 @@ inline bool operator==(const Matrix<T>& lhs, const Matrix<T>& rhs)
 
 	for (int i = 0; i < lhs.getRows(); ++i) {
 		for (int j = 0; j < rhs.getCols(); ++j) {
-			if (abs(lhs(i, j) - rhs(i, j)) > 0.000005f)
+			if (abs(lhs(i, j) - rhs(i, j)) > 0.000005f)   // TODO: make this not arbitrary
 				return false;
 		}
 	}
