@@ -71,3 +71,24 @@ inline constexpr unsigned int str2int(const char* str, int h = 0)
 {
 	return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
 }
+
+// singleton class for getting Mersenne-Twister objects
+class Random {
+public:
+	static std::mt19937& getMT() {
+		static std::mt19937 mt(getDevice()());
+		return mt;
+	}
+
+private:
+	Random() = delete;
+	Random(const Random& other) = delete;
+	Random(Random&& other) = delete;
+	Random& operator=(const Random& other) = delete;
+	Random& operator=(Random&& other) = delete;
+
+	static std::random_device& getDevice() {
+		static std::random_device rd;
+		return rd;
+	}
+};

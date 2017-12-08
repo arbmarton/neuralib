@@ -26,8 +26,8 @@ public:
 		, m(cols)
 		, data(new T[rows*cols])
 	{		
-		if (rows < 0 || cols < 0)
-			throw NeuralException("Matrix sizes cant be negative...");
+		/*if (rows < 0 || cols < 0)
+			throw NeuralException("Matrix sizes cant be negative...");*/
 
 		memset(data, T(0), sizeof(T)*rows*cols);
 	}
@@ -110,13 +110,13 @@ public:
 	}
 
 	Matrix& operator*=(const Matrix& rhs) {
-		if (m != rhs.n)
-			throw NeuralException("Matrix multiplication: incorrent matrix sizes...");
+		/*if (m != rhs.n)
+			throw NeuralException("Matrix multiplication: incorrent matrix sizes...");*/
 
 		Matrix temp(n, rhs.m);
 
 		// if the matrix is larger than a certain number use multithreading
-		if (temp.getCols() * temp.getRows() > 100) {
+		if (temp.getCols() * temp.getRows() > 100000) {
 
 			std::vector<std::future<void>> fut;
 			for (int i = 0; i < ThreadPoolWrapper::getThreads(); ++i) {
@@ -153,8 +153,8 @@ public:
 	}
 
 	Matrix& operator+=(const Matrix& rhs) {
-		if (n != rhs.n || m != rhs.m)
-			throw NeuralException("Matrix dimension mismatch in addition...");
+		/*if (n != rhs.n || m != rhs.m)
+			throw NeuralException("Matrix dimension mismatch in addition...");*/
 
 		for (int i = 0; i < n; ++i) {
 			for (int j = 0; j < m; ++j) {
@@ -166,8 +166,8 @@ public:
 	}
 
 	Matrix& operator-=(const Matrix& rhs) {
-		if (n != rhs.n || m != rhs.m)
-			throw NeuralException("Matrix dimension mismatch in addition...");
+		/*if (n != rhs.n || m != rhs.m)
+			throw NeuralException("Matrix dimension mismatch in addition...");*/
 
 		for (int i = 0; i < n; ++i) {
 			for (int j = 0; j < m; ++j) {
@@ -195,38 +195,38 @@ public:
 	}
 
 	void fillRand(const float& low, const float& high) {
-		std::random_device rd;
-		std::mt19937 rng(rd());
+		//std::random_device rd;
+		//std::mt19937 rng(rd());
 		std::uniform_real_distribution<float> uni(low, high);
 
 		for (int i = 0; i < n*m; ++i) {
-			data[i] = uni(rng);
+			data[i] = uni(Random::getMT());
 		}
 	}
 
 	void fillGauss(const float& mean, const float& sigma) {
-		std::random_device rd;
-		std::mt19937 rng(rd());
+		//std::random_device rd;
+		//std::mt19937 rng(rd());
 		std::normal_distribution<float> uni(mean, sigma);
 
 		for (int i = 0; i < n*m; ++i) {
-			data[i] = uni(rng);
+			data[i] = uni(Random::getMT());
 		}
 	}
 
 	void fillGaussNormalized(const float& mean, const float& sigma, const int& connections) {
-		std::random_device rd;
-		std::mt19937 rng(rd());
+		//std::random_device rd;
+		//std::mt19937 rng(rd());
 		std::normal_distribution<float> uni(mean, sigma);
 
 		for (int i = 0; i < n*m; ++i) {
-			data[i] = uni(rng) / sqrt(float(connections));
+			data[i] = uni(Random::getMT()) / sqrt(float(connections));
 		}
 	}
 
 	T getSquaredDifference(const Matrix<T>& cmp) {
-		if (n != cmp.n || m != cmp.m)
-			throw NeuralException("Invalid matrix sizes in squared difference calculation!");
+		/*if (n != cmp.n || m != cmp.m)
+			throw NeuralException("Invalid matrix sizes in squared difference calculation!");*/
 
 		T accum = 0.0f;
 		for (int i = 0; i < n; ++i) {
@@ -239,8 +239,8 @@ public:
 	}
 
 	Matrix<T> getSquaredDifferenceMatrix(const Matrix<T>& cmp) {
-		if (n != cmp.n || m != cmp.m)
-			throw NeuralException("Invalid matrix sizes in squared difference calculation!");
+		/*if (n != cmp.n || m != cmp.m)
+			throw NeuralException("Invalid matrix sizes in squared difference calculation!");*/
 
 		Matrix<T> ret(n, m);
 		for (int i = 0; i < n; ++i) {
@@ -253,8 +253,8 @@ public:
 	}
 
 	Matrix<T> getSquaredDifferenceMatrix(const std::vector<T>& cmp) {
-		if (n != cmp.size())
-			throw NeuralException("Invalid matrix sizes in squared difference (vector) calculation!");
+		/*if (n != cmp.size())
+			throw NeuralException("Invalid matrix sizes in squared difference (vector) calculation!");*/
 
 		Matrix<T> ret(n, 1);
 		for (int i = 0; i < n; ++i) {
@@ -265,8 +265,8 @@ public:
 	}
 
 	int largestIndex() const {
-		if (m != 1)
-			throw NeuralException("Apply to column vectors only...");
+		/*if (m != 1)
+			throw NeuralException("Apply to column vectors only...");*/
 
 		int ret = 0;
 		T largest = 0;
@@ -413,11 +413,11 @@ inline Matrix<U> operator*(const T& lhs, const Matrix<U>& rhs)
 template<class T>
 inline Matrix<T> hadamardProduct(const Matrix<T>& left, const Matrix<T>& right)
 {
-	if (left.getRows() != right.getRows() || left.getCols() != right.getCols())
+	/*if (left.getRows() != right.getRows() || left.getCols() != right.getCols())
 		throw NeuralException("Matrix dimension mismatch in hadamard product...");
 
 	if (left.getCols() != 1)
-		throw NeuralException("Hadamard product can only be applied to column vectors...");
+		throw NeuralException("Hadamard product can only be applied to column vectors...");*/
 
 	Matrix<T> ret(left.getRows(), 1);
 	for (int i = 0; i < left.getRows(); ++i) {
