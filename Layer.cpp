@@ -203,9 +203,11 @@ void Layer::calculateCostWeight()
 void Layer::update(
 	const Matrix<float>& weightUpdate,
 	const Matrix<float>& biasUpdate,
-	const float& multiplier)
+	const float& multiplier,
+	const float& regularization,
+	const int& trainingSetSize)
 {
-	weights -= multiplier * weightUpdate;
+	weights -= multiplier * weightUpdate - (regularization / trainingSetSize)*weights;
 	biases  -= multiplier * biasUpdate;
 }
 

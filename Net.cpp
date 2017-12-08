@@ -167,11 +167,13 @@ void Net::connectLayers()
 void Net::train(
 	const int&        epochNumber,
 	const int&        minibatchSizeParam,
-	const float&      newEta)
+	const float&      newEta,
+	const float&	  regularizationParam)
 {
 	epochs = epochNumber;
 	minibatchSize = minibatchSizeParam;
 	eta = newEta;
+	regularization = regularizationParam;
 
 	std::cout << "Starting calculations...\n";
 	printLayerInfo();
@@ -201,6 +203,7 @@ void Net::train(
 				biasUpdater[i]   = Matrix<float>(layers[i]->getSize(), 1);
 			}
 
+
 			for (int minibatchCounter = 0; minibatchCounter < minibatchSize; ++minibatchCounter) {
 
 				calculateActivationInAllLayers();
@@ -211,8 +214,10 @@ void Net::train(
 				addUpWeightsAndBiases(weightUpdater, biasUpdater);
 
 			}
+			
 
-			updateWeightsAndBiases(weightUpdater, biasUpdater, eta / float(minibatchSize));
+			updateWeightsAndBiases(weightUpdater, biasUpdater, eta / float(minibatchSize),
+				regularization, inputClass->getTotalSize());
 			//printOutputLayer();
 			
 		}
@@ -265,13 +270,15 @@ void Net::addUpWeightsAndBiases(
 void Net::updateWeightsAndBiases(
 	const std::vector<Matrix<float>>& weights,
 	const std::vector<Matrix<float>>& biases,
-	const float& multiplier) const
+	const float& multiplier,
+	const float& regularizationParam,
+	const int&   trainingSetSize) const
 {
 	for (int i = 0; i < layers.size(); ++i) {
 		if (dynamic_cast<InputLayer*> (layers[i])) continue;
 		if (dynamic_cast<OutputLayer*>(layers[i])) continue;
 
-		layers[i]->update(weights[i], biases[i], multiplier);
+		layers[i]->update(weights[i], biases[i], multiplier, regularizationParam, trainingSetSize);
 	}
 }
 

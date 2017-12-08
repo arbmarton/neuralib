@@ -10,6 +10,7 @@
 #include <vector>
 #include <random>
 
+
 enum class LayerType
 {
 	Input,
@@ -53,7 +54,9 @@ public:
 	virtual void update(
 		const Matrix<float>& weightUpdate,
 		const Matrix<float>& biasUpdate,
-		const float& multiplier
+		const float& multiplier,
+		const float& regularization,
+		const int& trainingSetSize
 	);
 
 	virtual void printLayerInfo() const;
@@ -102,7 +105,9 @@ public:
 	void update(
 		const Matrix<float>& weightUpdate,
 		const Matrix<float>& biasUpdate,
-		const float& multiplier) override {};
+		const float& multiplier,
+		const float& regularization,
+		const int& trainingSetSize) override {};
 
 	void printLayerInfo() const override;
 
@@ -128,8 +133,8 @@ public:
 	OutputLayer(const nlohmann::json& input);
 
 	void setIdealOutput(const std::function<void(std::vector<float>&)>& func);
-
 	Matrix<float> getIdealOutput() const;
+
 	void calculateDelta() override;
 
 	void resetCounters() { correct = 0; notCorrect = 0; }

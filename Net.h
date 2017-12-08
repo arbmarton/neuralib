@@ -37,7 +37,8 @@ public:
 	void train(
 		const int&        epochNumber,
 		const int&        minibatchSizeParam,
-		const float&      newEta);
+		const float&      newEta,
+		const float&	  regularizationParam);
 	void work();
 
 	void calculateActivationInAllLayers() const;
@@ -49,7 +50,9 @@ public:
 	void updateWeightsAndBiases(
 		const std::vector<Matrix<float>>& weights,
 		const std::vector<Matrix<float>>& biases,
-		const float& multiplier) const;
+		const float& multiplier,
+		const float& regularizationParam,
+		const int&   trainingSetSize) const;
 
 	void printLayer(const int& layerNumber) const;
 	void printOutputLayer() const;
@@ -64,6 +67,7 @@ private:
 	int   epochs;
 	int	  minibatchSize;
 	float eta;
+	float regularization;
 
 	NeuralInputClass* inputClass;
 	CostFunction	  costFunction;

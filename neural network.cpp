@@ -28,7 +28,7 @@
 
 int main()
 {
-	MNISTInputClass input(60000);
+	MNISTInputClass input(1000);
 	BitXORInputClass bit(1000);
 
 	Timer timer;
@@ -58,7 +58,7 @@ int main()
 
 		//std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 		timer.createTimePoint("before");
-		network.train(10, 10, 5.0f);
+		network.train(10000, 10, 5.0f, 0.01f);
 		timer.createTimePoint("after");
 
 		timer.printTimeDifferenceMs("before", "after");
