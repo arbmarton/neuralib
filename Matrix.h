@@ -116,7 +116,7 @@ public:
 		Matrix temp(n, rhs.m);
 
 		// if the matrix is larger than a certain number use multithreading
-		if (temp.getCols() * temp.getRows() > 100000) {
+		if (temp.getCols() * temp.getRows() > 1000000) {
 
 			std::vector<std::future<void>> fut;
 			for (int i = 0; i < ThreadPoolWrapper::getThreads(); ++i) {
@@ -179,10 +179,14 @@ public:
 	}
 
 	Matrix& operator*=(const float& rhs) {
-		for (int i = 0; i < n; ++i) {
+		/*for (int i = 0; i < n; ++i) {
 			for (int j = 0; j < m; ++j) {
 				data[i*m + j] *= rhs;
 			}
+		}*/
+
+		for (int i = 0; i < n*m; ++i) {
+			data[i] *= rhs;
 		}
 
 		return *this;
