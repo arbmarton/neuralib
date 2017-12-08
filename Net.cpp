@@ -15,6 +15,7 @@ Net::Net(const nlohmann::json& input)
 	: epochs(input["epochs"].get<int>())
 	, minibatchSize(input["minibatchsize"].get<int>())
 	, eta(input["eta"].get<float>())
+	, regularization(input["regularization"].get<float>())
 	, threads(std::thread::hardware_concurrency())
 {
 	std::vector<nlohmann::json> layersJson = input["layers"].get<std::vector<nlohmann::json>>();
@@ -323,6 +324,7 @@ nlohmann::json Net::toJSON() const
 	ret["epochs"] = epochs;
 	ret["minibatchsize"] = minibatchSize;
 	ret["eta"] = eta;
+	ret["regularization"] = regularization;
 
 	std::vector<nlohmann::json> jsonLayers;
 	jsonLayers.resize(layers.size());
