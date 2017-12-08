@@ -38,7 +38,7 @@ public:
 		const int&        epochNumber,
 		const int&        minibatchSizeParam,
 		const float&      newEta,
-		const float&	  regularizationParam);
+		const float&	  regularizationParam = 0);
 	void work();
 
 	void calculateActivationInAllLayers() const;
