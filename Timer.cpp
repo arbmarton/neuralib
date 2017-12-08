@@ -30,6 +30,26 @@ long long Timer::getTimeDifferenceMs(const std::string& pointOne, const std::str
 	return std::chrono::duration_cast<std::chrono::microseconds>(timeTwo - timeOne).count();
 }
 
+long long Timer::getTimeDifferenceSec(const std::string& pointOne, const std::string& pointTwo) const
+{
+	auto timeOne = times.at(pointOne);
+	auto timeTwo = times.at(pointTwo);
+
+	return std::chrono::duration_cast<std::chrono::seconds>(timeTwo - timeOne).count();
+}
+
+void Timer::printTimeDifferenceMs(const std::string& pointOne, const std::string& pointTwo) const
+{
+	std::cout <<"Time elased(ms) between "<<pointOne << " and " << pointTwo <<
+		" is: " << getTimeDifferenceMs(pointOne, pointTwo) << "\n";
+}
+
+void Timer::printTimeDifferenceSec(const std::string& pointOne, const std::string& pointTwo) const
+{
+	std::cout << "Time elased(sec) between " << pointOne << " and " << pointTwo <<
+		" is: " << getTimeDifferenceSec(pointOne, pointTwo) << "\n";
+}
+
 Timer::~Timer()
 {
 
