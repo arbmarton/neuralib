@@ -114,14 +114,14 @@ class ThreadPoolWrapper {
 public:
 	static ThreadPool& getThreadPool() {
 
-		int threads = std::thread::hardware_concurrency();
+		static int threads = std::thread::hardware_concurrency();
 
 		static ThreadPool tp(threads);
 		return tp;
 	}
 
 	static auto& getThreads() {
-		auto val = std::thread::hardware_concurrency();
+		static auto val = std::thread::hardware_concurrency();
 		return val;
 	}
 
