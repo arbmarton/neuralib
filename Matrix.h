@@ -92,19 +92,19 @@ public:
 	int getCols() const { return m; }
 
 	T& operator()(const int& i, const int& j) { 
-		if (i < 0 || j < 0)
+		/*if (i < 0 || j < 0)
 			throw NeuralException("Matrix index lower than zero...");
 		if ((i + 1) > n || (j + 1) > m) 
-			throw NeuralException("Matrix index out of range...");
+			throw NeuralException("Matrix index out of range...");*/
 
 		return data[i*m + j];
 	}
 
 	T operator()(const int& i, const int& j) const {
-		if (i < 0 || j < 0)
+		/*if (i < 0 || j < 0)
 			throw NeuralException("Matrix index lower than zero...");
 		if ((i + 1) > n || (j + 1) > m)
-			throw NeuralException("Matrix index out of range...");
+			throw NeuralException("Matrix index out of range...");*/
 
 		return data[i*m + j];
 	}
@@ -135,11 +135,12 @@ public:
 		}
 		else {
 			for (int i = 0; i < temp.getRows(); ++i) {
+				const int rowOffset = i*m;
 				for (int j = 0; j < temp.getCols(); ++j) {
 					T accum = T(0);
 
 					for (int k = 0; k < m; ++k) {
-						accum += data[i*m + k] * rhs(k, j);
+						accum += data[/*i*m*/ rowOffset + k] * rhs(k, j);
 					}
 
 					temp(i, j) = accum;
@@ -223,11 +224,11 @@ public:
 		}
 	}
 
-	float getSquaredDifference(const Matrix<T>& cmp) {
+	T getSquaredDifference(const Matrix<T>& cmp) {
 		if (n != cmp.n || m != cmp.m)
 			throw NeuralException("Invalid matrix sizes in squared difference calculation!");
 
-		float accum = 0.0f;
+		T accum = 0.0f;
 		for (int i = 0; i < n; ++i) {
 			for (int j = 0; j < m; ++j) {
 				accum += (data[i*m + j] - cmp(i, j)) * (data[i*m + j] - cmp(i, j));
@@ -337,18 +338,18 @@ private:
 	}
 
 	std::function<void(
-		const Matrix<float>* const left,
-		const Matrix<float>* const right,
+		const Matrix<T>* const left,
+		const Matrix<T>* const right,
 		const int start,
 		const int increment,
-		Matrix<float>* result)> getLambda()
+		Matrix<T>* result)> getLambda()
 	{
 		auto lambda = [](
-			const Matrix<float>* const left,
-			const Matrix<float>* const right,
+			const Matrix<T>* const left,
+			const Matrix<T>* const right,
 			const int start,
 			const int increment,
-			Matrix<float>* result
+			Matrix<T>* result
 			) -> void
 		{
 			for (int i = start; i < result->getRows(); i += increment) {
@@ -398,7 +399,7 @@ inline Matrix<T> operator*(Matrix<T> lhs, const float& rhs)
 template<class T, class U>
 inline Matrix<U> operator*(const T& lhs, const Matrix<U>& rhs)
 {
-	Matrix<float> ret(rhs.getRows(), rhs.getCols());
+	Matrix<T> ret(rhs.getRows(), rhs.getCols());
 
 	for (int i = 0; i < rhs.getRows(); ++i) {
 		for (int j = 0; j < rhs.getCols(); ++j) {
