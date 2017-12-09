@@ -126,11 +126,11 @@ public:
 	}
 
 private:
-	ThreadPoolWrapper() = delete;
-	ThreadPoolWrapper(const ThreadPoolWrapper& other) = delete;
-	ThreadPoolWrapper(ThreadPoolWrapper&& other) = delete;
-	ThreadPoolWrapper& operator=(const ThreadPoolWrapper& other) = delete;
-	ThreadPoolWrapper& operator=(ThreadPoolWrapper&& other) = delete;
+	ThreadPoolWrapper()												= delete;
+	ThreadPoolWrapper(const ThreadPoolWrapper& other)				= delete;
+	ThreadPoolWrapper(ThreadPoolWrapper&& other)					= delete;
+	ThreadPoolWrapper& operator=(const ThreadPoolWrapper& other)	= delete;
+	ThreadPoolWrapper& operator=(ThreadPoolWrapper&& other)			= delete;
 };
 
 

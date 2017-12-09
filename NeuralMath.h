@@ -32,14 +32,6 @@ Matrix<T> sigmoid(const Matrix<T>& input)
 template<class T>
 float sigmoidDerivative(const T& input)
 {
-	// if its too small or too large dont bother, the threshold could be even lower
-	/*if		(input >  50) return 0;
-	else if (input < -50) return 0;
-
-	float power = exp(input);
-
-	return power / ((power + 1)*(power + 1));*/
-
 	float sig = sigmoid(input);
 
 	return sig*(1 - sig);
@@ -76,16 +68,16 @@ inline constexpr unsigned int str2int(const char* str, int h = 0)
 class Random {
 public:
 	static std::mt19937& getMT() {
-		static std::mt19937 mt(getDevice()());
+		static std::mt19937 mt(getDevice()()); // The Parentheses of Trickery™
 		return mt;
 	}
 
 private:
-	Random() = delete;
-	Random(const Random& other) = delete;
-	Random(Random&& other) = delete;
-	Random& operator=(const Random& other) = delete;
-	Random& operator=(Random&& other) = delete;
+	Random()								= delete;
+	Random(const Random& other)				= delete;
+	Random(Random&& other)				    = delete;
+	Random& operator=(const Random& other)  = delete;
+	Random& operator=(Random&& other)		= delete;
 
 	static std::random_device& getDevice() {
 		static std::random_device rd;
