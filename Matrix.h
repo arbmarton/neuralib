@@ -294,8 +294,8 @@ public:
 			jsonVector[i] = data[i];
 		}
 
-		ret["n"] = n;
-		ret["m"] = m;
+		ret["n"]	= n;
+		ret["m"]	= m;
 		ret["data"] = jsonVector;
 
 		return ret;
@@ -309,26 +309,7 @@ private:
 	int m; // col
 	T* data;
 
-	void subMatrixMult(
-		const int& threadID,
-		const Matrix& left,
-		const Matrix& right,
-		Matrix* result) const
-	{
-		for (int i = 0; i < left.getRows(); ++i) {
-
-			for (int j = threadID; j < right.getCols(); j += Nthreads) {
-				T accum = T(0);
-
-				for (int k = 0; k < left.getCols(); ++k) {
-					accum += left(i, k)*right(k, j);
-				}
-
-				(*result)(i, j) = accum;
-			}
-		}
-	}
-
+	// used in threaded matrix multiplication
 	std::function<void(
 		const Matrix<T>* const left,
 		const Matrix<T>* const right,
