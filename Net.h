@@ -50,9 +50,9 @@ public:
 	void updateWeightsAndBiases(
 		const std::vector<Matrix<float>>& weights,
 		const std::vector<Matrix<float>>& biases,
-		const float& multiplier,
-		const float& regularizationParam,
-		const int&   trainingSetSize) const;
+		const float&					  multiplier,
+		const float&					  regularizationParam,
+		const int&						  trainingSetSize) const;
 
 	void printLayer(const int& layerNumber) const;
 	void printOutputLayer() const;

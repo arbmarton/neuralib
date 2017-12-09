@@ -179,12 +179,6 @@ public:
 	}
 
 	Matrix& operator*=(const float& rhs) {
-		/*for (int i = 0; i < n; ++i) {
-			for (int j = 0; j < m; ++j) {
-				data[i*m + j] *= rhs;
-			}
-		}*/
-
 		for (int i = 0; i < n*m; ++i) {
 			data[i] *= rhs;
 		}
@@ -199,8 +193,6 @@ public:
 	}
 
 	void fillRand(const float& low, const float& high) {
-		//std::random_device rd;
-		//std::mt19937 rng(rd());
 		std::uniform_real_distribution<float> uni(low, high);
 
 		for (int i = 0; i < n*m; ++i) {
@@ -209,8 +201,6 @@ public:
 	}
 
 	void fillGauss(const float& mean, const float& sigma) {
-		//std::random_device rd;
-		//std::mt19937 rng(rd());
 		std::normal_distribution<float> uni(mean, sigma);
 
 		for (int i = 0; i < n*m; ++i) {
@@ -219,8 +209,6 @@ public:
 	}
 
 	void fillGaussNormalized(const float& mean, const float& sigma, const int& connections) {
-		//std::random_device rd;
-		//std::mt19937 rng(rd());
 		std::normal_distribution<float> uni(mean, sigma);
 
 		for (int i = 0; i < n*m; ++i) {

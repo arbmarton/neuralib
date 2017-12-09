@@ -42,11 +42,11 @@ public:
 	virtual void setNextLayer(Layer* layer);
 
 	virtual Matrix<float> getActivations() const;
-	virtual Matrix<float> getBias() const;
-	virtual Matrix<float> getZed() const;
-	virtual Matrix<float> getDelta() const;
-	virtual Matrix<float> getCostBias() const;  // returns delta
-	virtual Matrix<float> getCostWeight() const;
+	virtual Matrix<float> getBias()		   const;
+	virtual Matrix<float> getZed()		   const;
+	virtual Matrix<float> getDelta()	   const;
+	virtual Matrix<float> getCostBias()	   const;  // returns delta
+	virtual Matrix<float> getCostWeight()  const;
 
 	virtual void calculateActivation();
 	virtual void calculateDelta();
@@ -54,9 +54,9 @@ public:
 	virtual void update(
 		const Matrix<float>& weightUpdate,
 		const Matrix<float>& biasUpdate,
-		const float& multiplier,
-		const float& regularization,
-		const int& trainingSetSize
+		const float&		 multiplier,
+		const float&		 regularization,
+		const int&			 trainingSetSize
 	);
 
 	virtual void printLayerInfo() const;
@@ -100,14 +100,14 @@ public:
 	void setInputFunction(const std::function<void(std::vector<Neuron*>&)>& func);
 
 	void calculateActivation() override;
-	void calculateDelta() override {};
+	void calculateDelta()      override {};
 	void calculateCostWeight() override {};
 	void update(
 		const Matrix<float>& weightUpdate,
 		const Matrix<float>& biasUpdate,
-		const float& multiplier,
-		const float& regularization,
-		const int& trainingSetSize) override {};
+		const float&		 multiplier,
+		const float&		 regularization,
+		const int&			 trainingSetSize) override {};
 
 	void printLayerInfo() const override;
 

@@ -171,9 +171,10 @@ void Net::train(
 	const float&      newEta,
 	const float&	  regularizationParam)
 {
-	epochs = epochNumber;
-	minibatchSize = minibatchSizeParam;
-	eta = newEta;
+	// save these to a member variable so the json writer can access it later
+	epochs         = epochNumber;
+	minibatchSize  = minibatchSizeParam;
+	eta            = newEta;
 	regularization = regularizationParam;
 
 	std::cout << "Starting calculations...\n";

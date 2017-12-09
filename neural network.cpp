@@ -28,7 +28,7 @@
 
 int main()
 {
-	MNISTInputClass input(1000);
+	MNISTInputClass input(60000);
 	BitXORInputClass bit(1000);
 
 	Timer timer;
@@ -40,31 +40,22 @@ int main()
 		Matrix<float> mat2(100, 100);
 		mat2.fillValue(1);
 
-		std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-		
 		for (int i = 0; i < 10000; ++i) {
 			Matrix<float> res = mat2*mat;
-		}
+		}*/
 		
-
-		std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-
-		std::cout << "time: " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << '\n';*/
 
 		Net network(&input, CostFunction::CrossEntropy);
 		network.createNewLayer(784,  NeuronType::Input,   LayerType::Input );
-		network.createNewLayer(30,   NeuronType::Sigmoid, LayerType::General);
+		network.createNewLayer(100,  NeuronType::Sigmoid, LayerType::General);
 		network.createNewLayer(10,   NeuronType::Sigmoid, LayerType::Output);
 
-		//std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 		timer.createTimePoint("before");
-		network.train(10000, 10, 5.0f, 0.01f);
+		network.train(10, 10, 5.0f, 0.01f);
 		timer.createTimePoint("after");
 
-		timer.printTimeDifferenceMs("before", "after");
-		//std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-		//std::cout << "time: " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << '\n';
-		//network.saveAs("net.json");
+		timer.printTimeDifferenceSec("before", "after");
+		//network.saveAs("mnist.json");
 
 
 		//Net cpy(getJson("net.json"));

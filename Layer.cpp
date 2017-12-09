@@ -526,11 +526,11 @@ nlohmann::json OutputLayer::toJSON() const
 	//?? neurons?
 
 	ret["activations"] = activations.toJSON();
-	ret["weights"] = weights.toJSON();
-	ret["biases"] = biases.toJSON();
-	ret["zed"] = zed.toJSON();
-	ret["delta"] = delta.toJSON();
-	ret["costweight"] = costWeight.toJSON();
+	ret["weights"]     = weights.toJSON();
+	ret["biases"]	   = biases.toJSON();
+	ret["zed"]		   = zed.toJSON();
+	ret["delta"]	   = delta.toJSON();
+	ret["costweight"]  = costWeight.toJSON();
 
 	return ret;
 }
