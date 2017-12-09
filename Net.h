@@ -13,13 +13,15 @@
 #include <thread>
 #include <fstream>
 
-//when constructing a net from json, the layers should be connected manually
+//when constructing a net from json, the layers should be connected "manually"
 
 
 class Net
 {
 public:
-	Net(NeuralInputClass* inputMaker, const CostFunction& cost = CostFunction::LeastSquares);
+	Net(NeuralInputClass* inputMaker,
+		const CostFunction& cost  = CostFunction::LeastSquares,
+		const Regularization& reg = Regularization::None);
 	Net(const nlohmann::json& input);
 
 	void createNewLayer(
@@ -63,14 +65,14 @@ public:
 
 	~Net();
 private:
-	// maybe these shouldnt be members, do i need these to get written out when saving?
 	int   epochs;
 	int	  minibatchSize;
 	float eta;
 	float regularization;
 
 	NeuralInputClass* inputClass;
-	CostFunction	  costFunction;
+	CostFunction	  costFunctionType;
+	Regularization	  regularizationType;
 
 	std::vector<Layer*> layers;
 

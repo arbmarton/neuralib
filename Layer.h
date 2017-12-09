@@ -26,7 +26,7 @@ public:
 		const NeuronType& newNeuronType,
 		const LayerType& newLayerType,
 		Layer* previous = nullptr,
-		Layer* _next = nullptr
+		Layer* _next    = nullptr
 	);
 
 	Layer(const nlohmann::json& input);
@@ -52,11 +52,12 @@ public:
 	virtual void calculateDelta();
 	virtual void calculateCostWeight();
 	virtual void update(
-		const Matrix<float>& weightUpdate,
-		const Matrix<float>& biasUpdate,
-		const float&		 multiplier,
-		const float&		 regularization,
-		const int&			 trainingSetSize
+		const Regularization& regMethod,
+		const Matrix<float>&  weightUpdate,
+		const Matrix<float>&  biasUpdate,
+		const float&		  multiplier,
+		const float&		  regularization,
+		const int&			  trainingSetSize
 	);
 
 	virtual void printLayerInfo() const;
@@ -103,11 +104,12 @@ public:
 	void calculateDelta()      override {};
 	void calculateCostWeight() override {};
 	void update(
-		const Matrix<float>& weightUpdate,
-		const Matrix<float>& biasUpdate,
-		const float&		 multiplier,
-		const float&		 regularization,
-		const int&			 trainingSetSize) override {};
+		const Regularization& regMethod,
+		const Matrix<float>&  weightUpdate,
+		const Matrix<float>&  biasUpdate,
+		const float&		  multiplier,
+		const float&		  regularization,
+		const int&			  trainingSetSize) override {};
 
 	void printLayerInfo() const override;
 
@@ -127,7 +129,7 @@ public:
 		const CostFunction& costType,
 		const std::function<void(std::vector<float>&)>& func,
 		Layer* previous = nullptr,
-		Layer* _next = nullptr
+		Layer* _next    = nullptr
 	);
 
 	OutputLayer(const nlohmann::json& input);

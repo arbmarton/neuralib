@@ -2,9 +2,10 @@
 #include "Net.h"
 
 
-Net::Net(NeuralInputClass* input, const CostFunction& cost)
+Net::Net(NeuralInputClass* input, const CostFunction& cost, const Regularization& reg)
 	: inputClass(input)
-	, costFunction(cost)
+	, costFunctionType(cost)
+	, regularizationType(reg)
 	, threads(std::thread::hardware_concurrency())
 {
 	input->init();
@@ -41,6 +42,9 @@ Net::Net(const nlohmann::json& input)
 			break;
 		}
 	}
+
+	costFunctionType   = CostFunction::CrossEntropy;
+	regularizationType = Regularization::None;
 
 	connectLayers();
 }
@@ -79,7 +83,7 @@ void Net::createNewLayer(const int& size, const NeuronType& neuronType, const La
 			new OutputLayer(
 				size,
 				neuronType,
-				costFunction,
+				costFunctionType,
 				inputClass->getOutputFunction(),
 				layers[layers.size() - 1]
 			)
@@ -280,7 +284,7 @@ void Net::updateWeightsAndBiases(
 		if (dynamic_cast<InputLayer*> (layers[i])) continue;
 		if (dynamic_cast<OutputLayer*>(layers[i])) continue;
 
-		layers[i]->update(weights[i], biases[i], multiplier, regularizationParam, trainingSetSize);
+		layers[i]->update(regularizationType, weights[i], biases[i], multiplier, regularizationParam, trainingSetSize);
 	}
 }
 
@@ -322,9 +326,9 @@ nlohmann::json Net::toJSON() const
 {
 	nlohmann::json ret;
 
-	ret["epochs"] = epochs;
-	ret["minibatchsize"] = minibatchSize;
-	ret["eta"] = eta;
+	ret["epochs"]		  = epochs;
+	ret["minibatchsize"]  = minibatchSize;
+	ret["eta"]			  = eta;
 	ret["regularization"] = regularization;
 
 	std::vector<nlohmann::json> jsonLayers;

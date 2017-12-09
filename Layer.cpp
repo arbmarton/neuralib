@@ -201,14 +201,37 @@ void Layer::calculateCostWeight()
 }
 
 void Layer::update(
-	const Matrix<float>& weightUpdate,
-	const Matrix<float>& biasUpdate,
-	const float& multiplier,
-	const float& regularization,
-	const int& trainingSetSize)
+	const Regularization& regMethod,
+	const Matrix<float>&  weightUpdate,
+	const Matrix<float>&  biasUpdate,
+	const float&		  multiplier,
+	const float&		  regularization,
+	const int&			  trainingSetSize)
 {
-	weights -= multiplier * weightUpdate - (regularization / trainingSetSize)*weights;
-	biases  -= multiplier * biasUpdate;
+	switch (regMethod)
+	{
+	case Regularization::L1:
+
+		weights -= multiplier * weightUpdate - (regularization / trainingSetSize)*weights.signum();
+		biases -= multiplier * biasUpdate;
+
+		break;
+
+	case Regularization::L2:
+
+		weights -= multiplier * weightUpdate - (regularization / trainingSetSize)*weights;
+		biases -= multiplier * biasUpdate;
+
+		break;
+
+	default:  // Regularization::None
+
+		weights -= multiplier * weightUpdate;
+		biases -= multiplier * biasUpdate;
+
+		break;
+	}
+	
 }
 
 void Layer::printLayerInfo() const

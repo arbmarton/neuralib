@@ -116,7 +116,7 @@ public:
 		Matrix temp(n, rhs.m);
 
 		// if the matrix is larger than a certain number use multithreading
-		if (temp.getCols() * temp.getRows() > 1000000) {
+		if (temp.getCols() * temp.getRows() > 10000) {
 
 			std::vector<std::future<void>> fut;
 			for (int i = 0; i < ThreadPoolWrapper::getThreads(); ++i) {
@@ -279,6 +279,18 @@ public:
 		}
 
 		return *this;
+	}
+
+	Matrix<T> signum() const {
+		Matrix<T> temp(*this);
+
+		for (int i = 0; i < n; ++i) {
+			for (int j = 0; j < m; ++j) {
+				temp(i, j) = sgn(data[i]);
+			}
+		}
+
+		return temp;
 	}
 
 	void print() const {

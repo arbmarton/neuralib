@@ -9,6 +9,12 @@ enum class CostFunction {
 	CrossEntropy
 };
 
+enum class Regularization {
+	None,
+	L1,
+	L2
+};
+
 template<class T>
 float sigmoid(const T& input)
 {
@@ -62,6 +68,14 @@ Matrix<T> crossEntropy(const Matrix<T>& input)
 inline constexpr unsigned int str2int(const char* str, int h = 0)
 {
 	return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
+}
+
+// credit:
+// https://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c
+template <typename T>
+int sgn(const T& val)
+{
+	return (T(0) < val) - (val < T(0));
 }
 
 // singleton class for getting Mersenne-Twister objects
