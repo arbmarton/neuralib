@@ -44,6 +44,7 @@ This project uses:
 - https://github.com/progschj/ThreadPool
 
 Current TODO list:
+ - convolutional layers
  - implementing more math stuff for better computation
  - creating more example inputclasses besides the MNIST one
  - CPU based multithreading somehow
