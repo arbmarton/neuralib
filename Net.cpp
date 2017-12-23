@@ -154,8 +154,8 @@ void Net::addInputClass(NeuralInputClass* inputclass)
 {
 	inputClass = inputclass;
 
-	dynamic_cast<InputLayer*>(getLayer(LayerType::Input))->setInputFunction(inputclass->getInputFunction());
-	dynamic_cast<OutputLayer*>(getLayer(LayerType::Output))->setIdealOutput(inputclass->getOutputFunction());
+	static_cast<InputLayer*>(getLayer(LayerType::Input))->setInputFunction(inputclass->getInputFunction());
+	static_cast<OutputLayer*>(getLayer(LayerType::Output))->setIdealOutput(inputclass->getOutputFunction());
 }
 
 // might be inefficient? 
