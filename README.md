@@ -7,7 +7,7 @@ You can save the actual state of you network in JSON format to the disk. This en
 Basic usage:
 ```c++
 
-// read 10000 MNIST images to memory
+// create an InputClass object - in this case it reads 10000 MNIST images to memory
 MNISTInputClass input(10000);
 
 // create a Net object, which uses the MNIST images read earlier, and define the cost function
@@ -44,6 +44,7 @@ This project uses:
 - https://github.com/progschj/ThreadPool
 
 Current TODO list:
+ - convolutional layers
  - implementing more math stuff for better computation
  - creating more example inputclasses besides the MNIST one
  - CPU based multithreading somehow
