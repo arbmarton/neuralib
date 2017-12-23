@@ -4,6 +4,7 @@
 #include "NeuralException.h"
 #include "Matrix.h"
 #include "NeuralMath.h"
+#include "FeatureMap.h"
 
 #include "json.hpp"
 
@@ -15,31 +16,72 @@ enum class LayerType
 {
 	Input,
 	General,
+	Convolutional,
 	Output
 };
 
-class Layer
+
+////////////////////////////////////////////////////////////
+///// LAYERBASE 
+////////////////////////////////////////////////////////////
+
+
+class LayerBase {
+public:
+	LayerBase(const int& newSize, LayerBase* _prev = nullptr, LayerBase* _next = nullptr)
+		: size(newSize)
+		, prev(_prev)
+		, next(_next)
+	{
+	}
+
+	virtual int getSize() const = 0;
+
+	virtual LayerBase* getPreviousLayer() const;
+	virtual LayerBase* getNextLayer() const;
+	virtual void setPreviousLayer(LayerBase* layer);
+	virtual void setNextLayer(LayerBase* layer);
+
+	virtual void printLayerInfo() const = 0;
+
+	virtual nlohmann::json toJSON() const = 0;
+
+	virtual ~LayerBase() {};
+
+protected:
+	int			size;
+	LayerBase*	prev;
+	LayerBase*	next;
+};
+
+
+////////////////////////////////////////////////////////////
+///// LAYER
+////////////////////////////////////////////////////////////
+
+
+class Layer : public LayerBase
 {
 public:
 	Layer(
 		const int& newSize,
 		const NeuronType& newNeuronType,
 		const LayerType& newLayerType,
-		Layer* previous = nullptr,
-		Layer* _next    = nullptr
+		LayerBase* _prev    = nullptr,
+		LayerBase* _next    = nullptr
 	);
 
 	Layer(const nlohmann::json& input);
 
-	virtual int getSize() const;
+	virtual int getSize() const override;
 	virtual std::vector<Neuron*> getNeurons() const;
-	virtual Neuron& getNeuron(const int& neuronNumber) const;  // cant return copy: abstract class  // maybe a pointer should be used? 
+	//virtual Neuron& getNeuron(const int& neuronNumber) const;  // cant return copy: abstract class  // maybe a pointer should be used? 
 
-	virtual Layer* getPreviousLayer() const;
-	virtual Layer* getNextLayer() const;
+	//virtual LayerBase* getPreviousLayer() const override;
+	//virtual LayerBase* getNextLayer() const override;
 
-	virtual void setPreviousLayer(Layer* layer);
-	virtual void setNextLayer(Layer* layer);
+	//virtual void setPreviousLayer(LayerBase* layer) override;
+	//virtual void setNextLayer(LayerBase* layer) override;
 
 	virtual Matrix<float> getActivations() const;
 	virtual Matrix<float> getBias()		   const;
@@ -60,19 +102,19 @@ public:
 		const int&			  trainingSetSize
 	);
 
-	virtual void printLayerInfo() const;
+	virtual void printLayerInfo() const override;
 
-	virtual nlohmann::json toJSON() const;
+	virtual nlohmann::json toJSON() const override;
 
 	virtual ~Layer();
 
 protected:
-	int						size;
+	//int						size;
 	NeuronType				neurontype;
 	LayerType				layertype;
 
-	Layer*					prev;
-	Layer*					next;
+	//Layer*					prev;
+	//Layer*					next;
 
 	std::vector<Neuron*>	neurons;
 
@@ -86,6 +128,34 @@ protected:
 	virtual void initWeights();
 	virtual void initBiases();
 };
+
+
+////////////////////////////////////////////////////////////
+///// CONVOLUTIONLAYER 
+////////////////////////////////////////////////////////////
+
+
+class ConvolutionLayer : public LayerBase {
+public:
+	ConvolutionLayer(
+		const int& newSize,
+		LayerBase* _prev = nullptr,
+		LayerBase* _next = nullptr
+	);
+
+	int getSize() const override;
+
+	nlohmann::json toJSON() const override { return nlohmann::json(); };
+	void printLayerInfo() const override {};
+private:
+	std::vector<FeatureMap*> featureMaps;
+};
+
+
+////////////////////////////////////////////////////////////
+///// INPUTLAYER 
+////////////////////////////////////////////////////////////
+
 
 class InputLayer : public Layer
 {
@@ -119,6 +189,11 @@ private:
 };
 
 
+////////////////////////////////////////////////////////////
+///// OUTPUTLAYER
+////////////////////////////////////////////////////////////
+
+
 //update json
 class OutputLayer : public Layer
 {
@@ -128,8 +203,8 @@ public:
 		const NeuronType& newNeuronType,
 		const CostFunction& costType,
 		const std::function<void(std::vector<float>&)>& func,
-		Layer* previous = nullptr,
-		Layer* _next    = nullptr
+		LayerBase* previous = nullptr,
+		LayerBase* _next    = nullptr
 	);
 
 	OutputLayer(const nlohmann::json& input);
@@ -156,3 +231,4 @@ private:
 
 	void initBiases() override;
 };
+

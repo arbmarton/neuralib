@@ -63,17 +63,20 @@ void Net::createNewLayer(const int& size, const NeuronType& neuronType, const La
 
 		if (layers.size() > 0) {
 			layers.push_back(
-				new Layer(
-					size,
-					neuronType,
-					layerType,
-					layers[layers.size() - 1]
-				)
+				new Layer(size, neuronType, layerType, layers[layers.size() - 1])
 			);
 		}
 		else {
 			layers.push_back(new Layer(size, neuronType, layerType));
 		}
+
+		break;
+
+	case LayerType::Convolutional:
+
+		layers.push_back(
+			new ConvolutionLayer(size)
+		);
 
 		break;
 
@@ -98,7 +101,7 @@ void Net::createNewLayer(const int& size, const NeuronType& neuronType, const La
 	connectLayers();
 }
 
-Layer* Net::getLayer(const int& layerNumber) const
+LayerBase* Net::getLayer(const int& layerNumber) const
 {
 	if (layerNumber > (layers.size() - 1)) {
 		throw NeuralException("invalid layer access index...\n");
@@ -108,7 +111,7 @@ Layer* Net::getLayer(const int& layerNumber) const
 }
 
 
-Layer* Net::getLayer(const LayerType& layerType) const
+LayerBase* Net::getLayer(const LayerType& layerType) const
 {
 	auto startIter = layers.begin();
 	auto endIter   = layers.end();
@@ -142,7 +145,7 @@ Layer* Net::getLayer(const LayerType& layerType) const
 	}
 }
 
-Layer* Net::getLastLayer() const
+LayerBase* Net::getLastLayer() const
 {
 	return layers[layers.size() - 1];
 }
@@ -229,7 +232,7 @@ void Net::train(
 		}
 		
 		std::cout << "After epoch number " << epochCounter + 1 
-			<< ", the ratio is: "<< dynamic_cast<OutputLayer*>(getLastLayer())->getRatio() << '\n';
+			<< ", the ratio is: "<< static_cast<OutputLayer*>(getLastLayer())->getRatio() << '\n';
 		//std::cout << layers[1]->getCostWeight();
 		//printOutputLayer();
 	}
@@ -242,22 +245,22 @@ void Net::work()
 
 void Net::calculateActivationInAllLayers() const
 {
-	for (Layer* layer : layers) {
-		layer->calculateActivation();
+	for (LayerBase* layer : layers) {
+		static_cast<Layer*>(layer)->calculateActivation();
 	}
 }
 
 void Net::calculateDeltaInAllLayers() const
 {
 	for (int i = layers.size() - 1; i >= 0; --i) {  // inputlayer wont do anything, we can include it
-		layers[i]->calculateDelta();
+		static_cast<Layer*>(layers[i])->calculateDelta();
 	}
 }
 
 void Net::calculateDerivativesInAllLayers() const
 {
 	for (int i = layers.size() - 1; i >= 0; --i) {  // inputlayer wont do anything, we can include it
-		layers[i]->calculateCostWeight();
+		static_cast<Layer*>(layers[i])->calculateCostWeight();
 	}
 }
 
@@ -268,8 +271,8 @@ void Net::addUpWeightsAndBiases(
 	for (int i = 0; i < layers.size(); ++i) {
 		if (dynamic_cast<InputLayer*>(layers[i])) continue;
 
-		weights[i] += layers[i]->getCostWeight();
-		biases[i]  += layers[i]->getCostBias();
+		weights[i] += static_cast<Layer*>(layers[i])->getCostWeight();
+		biases[i]  += static_cast<Layer*>(layers[i])->getCostBias();
 	}
 }
 
@@ -284,13 +287,15 @@ void Net::updateWeightsAndBiases(
 		if (dynamic_cast<InputLayer*> (layers[i])) continue;
 		if (dynamic_cast<OutputLayer*>(layers[i])) continue;
 
-		layers[i]->update(regularizationType, weights[i], biases[i], multiplier, regularizationParam, trainingSetSize);
+		static_cast<Layer*>(
+			layers[i])->update(regularizationType, weights[i], biases[i], multiplier, regularizationParam, trainingSetSize
+		);
 	}
 }
 
 void Net::printLayer(const int& layerNumber) const
 {
-	Layer* out = getLayer(layerNumber);
+	Layer* out = static_cast<Layer*>(getLayer(layerNumber));
 
 	std::cout << "Printing layer number: " << layerNumber << "...\n";
 	for (Neuron* neuron : out->getNeurons()) {
@@ -302,7 +307,7 @@ void Net::printLayer(const int& layerNumber) const
 
 void Net::printOutputLayer() const
 {
-	Layer* out = getLayer(LayerType::Output);
+	Layer* out = static_cast<Layer*>(getLayer(LayerType::Output));
 
 	std::cout << "Printing output layer...\n";
 	for (Neuron* neuron : out->getNeurons()) {
@@ -315,7 +320,7 @@ void Net::printOutputLayer() const
 void Net::printLayerInfo() const
 {
 	int count = 0;
-	for (Layer* layer : layers) {
+	for (LayerBase* layer : layers) {
 		std::cout << "LAYER NUMBER " << count << ":\n";
 		layer->printLayerInfo();
 		count++;

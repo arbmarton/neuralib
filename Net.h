@@ -30,9 +30,9 @@ public:
 		const LayerType&  layerType
 	);
 
-	Layer* getLayer(const int& layerNumber) const;
-	Layer* getLayer(const LayerType& layerType) const;
-	Layer* getLastLayer() const;
+	LayerBase* getLayer(const int& layerNumber) const;
+	LayerBase* getLayer(const LayerType& layerType) const;
+	LayerBase* getLastLayer() const;
 
 	void addInputClass(NeuralInputClass* inputclass);
 
@@ -74,7 +74,7 @@ private:
 	CostFunction	  costFunctionType;
 	Regularization	  regularizationType;
 
-	std::vector<Layer*> layers;
+	std::vector<LayerBase*> layers;
 
 	void connectLayers();
 

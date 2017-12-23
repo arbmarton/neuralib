@@ -4,23 +4,44 @@
 #include <iostream>
 
 
+LayerBase* LayerBase::getPreviousLayer() const
+{
+	return prev;
+}
+
+LayerBase* LayerBase::getNextLayer() const
+{
+	return next;
+}
+
+void LayerBase::setPreviousLayer(LayerBase* layer)
+{
+	prev = layer;
+}
+
+void LayerBase::setNextLayer(LayerBase* layer)
+{
+	next = layer;
+}
+
 Layer::Layer(
 	const int&        newSize,
 	const NeuronType& newNeuronType,
 	const LayerType&  newLayerType,
-	Layer* previous,
-	Layer* _next)
-	: size(newSize)
+	LayerBase* _prev,
+	LayerBase* _next)
+	//: size(newSize)
+	: LayerBase(newSize, _prev, _next)
 	, neurontype(newNeuronType)
 	, layertype(newLayerType)
-	, prev(previous)
-	, next(_next)
-	, weights(Matrix<float>(newSize, previous ? previous->activations.getRows() : newSize))
+	//, prev(previous)
+	//, next(_next)
+	, weights(Matrix<float>(newSize, _prev ? dynamic_cast<Layer*>(_prev)->activations.getRows() : newSize))
 	, activations(Matrix<float>(newSize, 1))
 	, biases(Matrix<float>(newSize, 1))
 	, zed(Matrix<float>(newSize, 1))
 	, delta(Matrix<float>(newSize, 1))
-	, costWeight(Matrix<float>(newSize, previous ? previous->activations.getRows() : newSize))
+	, costWeight(Matrix<float>(newSize, _prev ? dynamic_cast<Layer*>(_prev)->activations.getRows() : newSize))
 {
 	neurons.resize(newSize);
 
@@ -45,7 +66,8 @@ Layer::Layer(
 }
 
 Layer::Layer(const nlohmann::json& input)
-	: size(input["size"].get<int>())
+	//: size(input["size"].get<int>())
+	: LayerBase(input["size"].get<int>())
 	, weights(input["weights"].get<nlohmann::json>())
 	, activations(input["activations"].get<nlohmann::json>())
 	, biases(input["biases"].get<nlohmann::json>())
@@ -117,31 +139,6 @@ std::vector<Neuron*> Layer::getNeurons() const
 	return neurons;
 }
 
-Neuron& Layer::getNeuron(const int& neuronNumber) const
-{
-	return *neurons[neuronNumber];
-}
-
-Layer* Layer::getPreviousLayer() const
-{
-	return prev;
-}
-
-Layer* Layer::getNextLayer() const
-{
-	return next;
-}
-
-void Layer::setPreviousLayer(Layer* layer)
-{
-	prev = layer;
-}
-
-void Layer::setNextLayer(Layer* layer)
-{
-	next = layer;
-}
-
 Matrix<float> Layer::getActivations() const
 {
 	return activations;
@@ -174,7 +171,7 @@ Matrix<float> Layer::getCostWeight() const
 
 void Layer::calculateActivation()
 {
-	auto temp = weights * (prev->activations);
+	auto temp = weights * (dynamic_cast<Layer*>(prev)->activations);
 	//temp += biases;
 
 	zed = temp + biases;
@@ -189,15 +186,17 @@ void Layer::calculateActivation()
 
 void Layer::calculateDelta()
 {
+	auto nextPtr = dynamic_cast<Layer*>(next);
 	delta = hadamardProduct(
-		transpose(next->weights)*next->delta,
+		transpose(nextPtr->weights)*nextPtr->delta,
 		sigmoidDerivative(zed)
 	);
 }
 
 void Layer::calculateCostWeight()
 {
-	costWeight = delta * transpose(prev->activations);
+	auto prevPtr = dynamic_cast<Layer*>(prev);
+	costWeight = delta * transpose(prevPtr->activations);
 }
 
 void Layer::update(
@@ -329,6 +328,22 @@ Layer::~Layer()
 	}
 }
 
+
+ConvolutionLayer::ConvolutionLayer(
+	const int& newSize,
+	LayerBase* _prev,
+	LayerBase* _next
+)
+	:LayerBase(newSize, _prev, _next)
+{
+	featureMaps.resize(newSize);
+}
+
+int ConvolutionLayer::getSize() const
+{
+	return featureMaps.size();
+}
+
 InputLayer::InputLayer(
 	const int& newSize,
 	const NeuronType& newNeuronType,
@@ -381,8 +396,8 @@ OutputLayer::OutputLayer(
 	const NeuronType& newNeuronType,
 	const CostFunction& costType,
 	const std::function<void(std::vector<float>&)>& func,
-	Layer* previous,
-	Layer* _next)
+	LayerBase* previous,
+	LayerBase* _next)
 	: Layer(newSize, newNeuronType, LayerType::Output, previous, _next)
 	, idealOutputFunction(func)
 	, costFunctionType(costType)
