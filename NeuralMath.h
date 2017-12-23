@@ -3,6 +3,7 @@
 #include "Matrix.h"
 
 #include <math.h>
+#include <limits>
 
 enum class CostFunction {
 	LeastSquares,
@@ -12,6 +13,11 @@ enum class CostFunction {
 enum class Regularization {
 	None,
 	L1,
+	L2
+};
+
+enum class PoolingMethod {
+	max,
 	L2
 };
 
@@ -63,7 +69,99 @@ Matrix<T> crossEntropy(const Matrix<T>& input)
 	
 }
 
-// basically a string to int hash function for switching
+// do i need to prepare for inputX != inputY?
+template<class T>
+void convolve(
+	const T* const input,
+	const int& inputX,
+	const int& inputY,
+	const T* const kernel,
+	const int& kernelX,
+	const int& kernelY,
+	T* result)
+{
+	const int resultX = inputX - 2 * floor(kernelX / 2);
+	//const int resultY = inputY - 2 * floor(kernelY);
+
+	for (int xStart = 0; xStart < inputX - kernelX + 1; ++xStart) {
+		for (int yStart = 0; yStart < inputY - kernelY + 1; ++yStart) {
+
+			T accum = T(0);
+			for (int i = 0; i < kernelX; ++i) {
+				const int offset = xStart + i;
+				for (int j = 0; j < kernelY; ++j) {
+					accum += input[offset + (yStart + j)*inputX] * kernel[i + j*kernelX];
+				}
+			}
+			
+			result[xStart + yStart*resultX] = accum;
+		}
+	}
+}
+
+template<class T>
+void pool(
+	const PoolingMethod& pooltype,
+	const int& poolX,
+	const int& poolY,
+	const T* const input,
+	const int& inputX,
+	const int& inputY,
+	T* result,
+	const int& resultX,
+	const int& resultY)
+{
+	for (int i = 0; i < resultX; ++i) {
+		for (int j = 0; j < resultY; ++j) {
+
+			T accum;
+
+			switch (pooltype)
+			{
+			case PoolingMethod::max:
+
+				accum = std::numeric_limits<T>::min();
+
+				for (int k = i*poolX; k < (i + 1)*poolX; ++k) {
+					for (int l = j*poolY; l < (j + 1)*poolY; ++l) {
+
+						T temp = input[k + l*inputX];
+
+						if (temp > accum) {
+							accum = temp;
+						}
+					}
+				}
+
+				break;
+
+			case PoolingMethod::L2:
+
+				accum = 0;
+
+				for (int k = i*poolX; k < (i + 1)*poolX; ++k) {
+					for (int l = j*poolY; l < (j + 1)*poolY; ++l) {
+
+						T temp = input[k + l*inputX];
+
+						accum += temp*temp;
+					}
+				}
+
+				accum = sqrt(accum);
+
+				break;
+
+			default:
+				break;
+			}
+
+			result[i + resultX*j] = accum;
+		}
+	}
+}
+
+// basically a string to int hash function for switching, credit:
 // https://stackoverflow.com/questions/16388510/evaluate-a-string-with-a-switch-in-c
 inline constexpr unsigned int str2int(const char* str, int h = 0)
 {
