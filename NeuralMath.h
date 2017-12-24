@@ -2,24 +2,29 @@
 
 #include "Matrix.h"
 #include "FeatureMap.h"
+#include "Pool.h"
 
 #include <math.h>
 #include <limits>
 
 class FeatureMap;
+class Pool;
 
-enum class CostFunction {
+enum class CostFunction 
+{
 	LeastSquares,
 	CrossEntropy
 };
 
-enum class Regularization {
+enum class Regularization
+{
 	None,
 	L1,
 	L2
 };
 
-enum class PoolingMethod {
+enum class PoolingMethod
+{
 	max,
 	L2
 };
@@ -175,6 +180,16 @@ void createPool(
 			result[i + resultX*j] = accum;
 		}
 	}
+}
+
+template<class T>
+void createPool(const PoolingMethod& pooltype, const FeatureMap& feat, const Pool& pool)
+{
+	createPool(
+		pooltype, pool.getWidth(), pool.getHeight(),
+		feat.getResult(), feat.getResult().getCols(), feat.getResult().getRows(),
+		pool.getResult(), pool.getResult().getCols(), pool.getResult().getRows()
+	);
 }
 
 // basically a string to int hash function for switching, credit:
