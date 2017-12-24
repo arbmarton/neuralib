@@ -425,8 +425,7 @@ PoolingLayer::PoolingLayer(
 void PoolingLayer::init()
 {
 	for (Pool* pool : pools) {
-		pool = new Pool();
-		pool->init();
+		pool = new Pool(PoolingMethod::L2, width, height, this);
 	}
 }
 
