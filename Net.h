@@ -29,6 +29,12 @@ public:
 		const NeuronType& neuronType,
 		const LayerType&  layerType
 	);
+	void createNewLayer(
+		const int& size,
+		const LayerType& layertype,
+		const int& width,
+		const int& heights
+	);
 
 	LayerBase* getLayer(const int& layerNumber) const;
 	LayerBase* getLayer(const LayerType& layerType) const;

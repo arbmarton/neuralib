@@ -72,14 +72,6 @@ void Net::createNewLayer(const int& size, const NeuronType& neuronType, const La
 
 		break;
 
-	case LayerType::Convolutional:
-
-		layers.push_back(
-			new ConvolutionLayer(size)
-		);
-
-		break;
-
 	case LayerType::Output:
 
 		layers.push_back(
@@ -95,10 +87,29 @@ void Net::createNewLayer(const int& size, const NeuronType& neuronType, const La
 		break;
 
 	default:
+		throw NeuralException("\nadding new layer failed\n");
 		break;
 	}
 
 	connectLayers();
+}
+
+void Net::createNewLayer(const int& size, const LayerType& layertype, const int& width, const int& height)
+{
+	switch (layertype)
+	{
+	case LayerType::Convolutional:
+
+		layers.push_back(
+			new ConvolutionLayer(size, width, height, layers[layers.size() - 1])
+		);
+
+		break;
+
+	default:
+		throw NeuralException("\nadding new layer failed\n");
+		break;
+	}
 }
 
 LayerBase* Net::getLayer(const int& layerNumber) const
