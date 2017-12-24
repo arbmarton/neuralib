@@ -4,6 +4,21 @@
 #include <iostream>
 
 
+////////////////////////////////////////////////////////////
+///// LAYERBASE 
+////////////////////////////////////////////////////////////
+
+
+LayerBase::LayerBase(const int& newSize, LayerBase* _prev, LayerBase* _next)
+	: size(newSize)
+	, activations(Matrix<float>(newSize, 1))
+	, prev(_prev)
+	, next(_next)
+{
+
+}
+
+
 LayerBase* LayerBase::getPreviousLayer() const
 {
 	return prev;
@@ -24,24 +39,32 @@ void LayerBase::setNextLayer(LayerBase* layer)
 	next = layer;
 }
 
+Matrix<float> LayerBase::getActivations() const
+{
+	return activations;
+}
+
+
+////////////////////////////////////////////////////////////
+///// LAYER
+////////////////////////////////////////////////////////////
+
+
 Layer::Layer(
 	const int&        newSize,
 	const NeuronType& newNeuronType,
 	const LayerType&  newLayerType,
 	LayerBase* _prev,
 	LayerBase* _next)
-	//: size(newSize)
 	: LayerBase(newSize, _prev, _next)
 	, neurontype(newNeuronType)
 	, layertype(newLayerType)
-	//, prev(previous)
-	//, next(_next)
-	, weights(Matrix<float>(newSize, _prev ? dynamic_cast<Layer*>(_prev)->activations.getRows() : newSize))
-	, activations(Matrix<float>(newSize, 1))
+	, weights(Matrix<float>(newSize, _prev ? static_cast<Layer*>(_prev)->activations.getRows() : newSize))
+//	, activations(Matrix<float>(newSize, 1))
 	, biases(Matrix<float>(newSize, 1))
 	, zed(Matrix<float>(newSize, 1))
 	, delta(Matrix<float>(newSize, 1))
-	, costWeight(Matrix<float>(newSize, _prev ? dynamic_cast<Layer*>(_prev)->activations.getRows() : newSize))
+	, costWeight(Matrix<float>(newSize, _prev ? static_cast<Layer*>(_prev)->activations.getRows() : newSize))
 {
 	neurons.resize(newSize);
 
@@ -60,16 +83,14 @@ Layer::Layer(
 	}
 
 	if (newLayerType != LayerType::Input) {
-		initWeights();
-		initBiases();
+		init();
 	}
 }
 
 Layer::Layer(const nlohmann::json& input)
-	//: size(input["size"].get<int>())
 	: LayerBase(input["size"].get<int>())
 	, weights(input["weights"].get<nlohmann::json>())
-	, activations(input["activations"].get<nlohmann::json>())
+//	, activations(input["activations"].get<nlohmann::json>())
 	, biases(input["biases"].get<nlohmann::json>())
 	, zed(input["zed"].get<nlohmann::json>())
 	, delta(input["delta"].get<nlohmann::json>())
@@ -137,11 +158,6 @@ int Layer::getSize() const
 std::vector<Neuron*> Layer::getNeurons() const
 {
 	return neurons;
-}
-
-Matrix<float> Layer::getActivations() const
-{
-	return activations;
 }
 
 Matrix<float> Layer::getBias() const
@@ -253,6 +269,12 @@ void Layer::printLayerInfo() const
 	std::cout << "Layertype: " + type + "\nNeurontype: " + _neurontype + "\nLayersize: " + size << "\n\n";
 }
 
+void Layer::init()
+{
+	initWeights();
+	initBiases();
+}
+
 void Layer::initWeights()
 {
 	//weights.fillGauss(0, 1);
@@ -329,20 +351,114 @@ Layer::~Layer()
 }
 
 
+////////////////////////////////////////////////////////////
+///// CONVOLUTIONLAYER 
+////////////////////////////////////////////////////////////
+
+
 ConvolutionLayer::ConvolutionLayer(
 	const int& newSize,
+	const int& width,
+	const int& height,
 	LayerBase* _prev,
-	LayerBase* _next
-)
-	:LayerBase(newSize, _prev, _next)
+	LayerBase* _next)
+	: LayerBase(newSize, _prev, _next)
+	, kernelWidth(width)
+	, kernelHeight(height)
 {
 	featureMaps.resize(newSize);
+}
+
+void ConvolutionLayer::init()
+{
+	for (FeatureMap* feat : featureMaps) {
+		feat = new FeatureMap(kernelWidth, kernelHeight, this);
+		feat->init();
+	}
 }
 
 int ConvolutionLayer::getSize() const
 {
 	return featureMaps.size();
 }
+
+std::vector<FeatureMap*>& ConvolutionLayer::getMaps()
+{
+	return featureMaps;
+}
+
+void ConvolutionLayer::calculateActivation()
+{
+	for (FeatureMap* feat : featureMaps) {
+		convolve(prev->getActivations(), *feat);
+	}
+}
+
+ConvolutionLayer::~ConvolutionLayer()
+{
+	for (int i = 0; i < size; ++i) {
+		delete featureMaps[i];
+	}
+}
+
+////////////////////////////////////////////////////////////
+///// POOLINGLAYER
+////////////////////////////////////////////////////////////
+
+
+PoolingLayer::PoolingLayer(
+	const int& newSize,
+	const PoolingMethod& _method,
+	const int& poolWidth,
+	const int& poolHeight,
+	ConvolutionLayer*   _prev,
+	LayerBase*			_next
+)
+	: LayerBase(newSize, _prev, _next)
+	, method(_method)
+	, width(poolWidth)
+	, height(poolHeight)
+{
+	pools.resize(newSize);
+}
+
+void PoolingLayer::init()
+{
+	for (Pool* pool : pools) {
+		pool = new Pool();
+		pool->init();
+	}
+}
+
+int PoolingLayer::getSize() const
+{
+	return pools.size();
+}
+
+void PoolingLayer::calculateActivation()
+{
+	ConvolutionLayer* previous = static_cast<ConvolutionLayer*>(prev);
+
+	for (int i = 0; i < pools.size(); ++i) {
+		/*createPool(
+			method, width, height,
+			previous->getMaps()[i], 1, 1,
+			pools[i].getResult, 1, 1);*/
+	}
+}
+
+PoolingLayer::~PoolingLayer()
+{
+	for (int i = 0; i < pools.size(); ++i) {
+		delete pools[i];
+	}
+}
+
+
+////////////////////////////////////////////////////////////
+///// INPUTLAYER 
+////////////////////////////////////////////////////////////
+
 
 InputLayer::InputLayer(
 	const int& newSize,
@@ -391,6 +507,12 @@ InputLayer::~InputLayer()
 
 }
 
+
+////////////////////////////////////////////////////////////
+///// OUTPUTLAYER
+////////////////////////////////////////////////////////////
+
+
 OutputLayer::OutputLayer(
 	const int& newSize,
 	const NeuronType& newNeuronType,
@@ -409,8 +531,7 @@ OutputLayer::OutputLayer(
 		neurons[i] = new Sigmoid();
 	}
 
-	initWeights();
-	initBiases();
+	init();
 }
 
 OutputLayer::OutputLayer(const nlohmann::json& input)

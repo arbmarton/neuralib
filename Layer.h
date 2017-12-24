@@ -5,12 +5,20 @@
 #include "Matrix.h"
 #include "NeuralMath.h"
 #include "FeatureMap.h"
+#include "Pool.h"
 
 #include "json.hpp"
 
 #include <vector>
 #include <random>
 
+// TODO: json constructor cleanup
+
+class FeatureMap;
+class Pool;
+enum class CostFunction;
+enum class Regularization;
+enum class PoolingMethod;
 
 enum class LayerType
 {
@@ -25,15 +33,10 @@ enum class LayerType
 ///// LAYERBASE 
 ////////////////////////////////////////////////////////////
 
-
+// activation lehet hogy mégsem ebbe kéne
 class LayerBase {
 public:
-	LayerBase(const int& newSize, LayerBase* _prev = nullptr, LayerBase* _next = nullptr)
-		: size(newSize)
-		, prev(_prev)
-		, next(_next)
-	{
-	}
+	LayerBase(const int& newSize, LayerBase* _prev = nullptr, LayerBase* _next = nullptr);
 
 	virtual int getSize() const = 0;
 
@@ -42,6 +45,10 @@ public:
 	virtual void setPreviousLayer(LayerBase* layer);
 	virtual void setNextLayer(LayerBase* layer);
 
+	virtual Matrix<float> getActivations() const;
+
+	virtual void calculateActivation() = 0;
+
 	virtual void printLayerInfo() const = 0;
 
 	virtual nlohmann::json toJSON() const = 0;
@@ -49,9 +56,14 @@ public:
 	virtual ~LayerBase() {};
 
 protected:
-	int			size;
-	LayerBase*	prev;
-	LayerBase*	next;
+	int				size;
+
+	LayerBase*		prev;
+	LayerBase*		next;
+
+	Matrix<float>	activations;
+
+	virtual void init() = 0;
 };
 
 
@@ -66,7 +78,7 @@ public:
 	Layer(
 		const int& newSize,
 		const NeuronType& newNeuronType,
-		const LayerType& newLayerType,
+		const LayerType&  newLayerType,
 		LayerBase* _prev    = nullptr,
 		LayerBase* _next    = nullptr
 	);
@@ -77,20 +89,14 @@ public:
 	virtual std::vector<Neuron*> getNeurons() const;
 	//virtual Neuron& getNeuron(const int& neuronNumber) const;  // cant return copy: abstract class  // maybe a pointer should be used? 
 
-	//virtual LayerBase* getPreviousLayer() const override;
-	//virtual LayerBase* getNextLayer() const override;
-
-	//virtual void setPreviousLayer(LayerBase* layer) override;
-	//virtual void setNextLayer(LayerBase* layer) override;
-
-	virtual Matrix<float> getActivations() const;
+	//virtual Matrix<float> getActivations() const override;
 	virtual Matrix<float> getBias()		   const;
 	virtual Matrix<float> getZed()		   const;
 	virtual Matrix<float> getDelta()	   const;
 	virtual Matrix<float> getCostBias()	   const;  // returns delta
 	virtual Matrix<float> getCostWeight()  const;
 
-	virtual void calculateActivation();
+	virtual void calculateActivation() override;
 	virtual void calculateDelta();
 	virtual void calculateCostWeight();
 	virtual void update(
@@ -109,22 +115,18 @@ public:
 	virtual ~Layer();
 
 protected:
-	//int						size;
 	NeuronType				neurontype;
 	LayerType				layertype;
 
-	//Layer*					prev;
-	//Layer*					next;
-
 	std::vector<Neuron*>	neurons;
 
-	Matrix<float>			activations;
 	Matrix<float>			weights;
 	Matrix<float>			biases;
 	Matrix<float>			zed;
 	Matrix<float>			delta;
 	Matrix<float>			costWeight;  // the weight matrix delta basically
 
+	virtual void init() override;
 	virtual void initWeights();
 	virtual void initBiases();
 };
@@ -139,16 +141,66 @@ class ConvolutionLayer : public LayerBase {
 public:
 	ConvolutionLayer(
 		const int& newSize,
-		LayerBase* _prev = nullptr,
+		const int& width,
+		const int& height,
+		LayerBase* _prev,
 		LayerBase* _next = nullptr
 	);
 
-	int getSize() const override;
+	virtual void init() override;
 
-	nlohmann::json toJSON() const override { return nlohmann::json(); };
-	void printLayerInfo() const override {};
+	virtual int getSize() const override;
+	std::vector<FeatureMap*>& getMaps();
+
+	virtual void calculateActivation() override;
+
+	nlohmann::json toJSON() const override { return nlohmann::json(); };  // dummy
+
+	void printLayerInfo() const override {};  // dummy
+
+	virtual ~ConvolutionLayer();
 private:
 	std::vector<FeatureMap*> featureMaps;
+	int kernelWidth;
+	int kernelHeight;
+	int resultWidth;
+	int resultHeight;
+};
+
+////////////////////////////////////////////////////////////
+///// PoolingLayer
+////////////////////////////////////////////////////////////
+
+
+class PoolingLayer : public LayerBase
+{
+public:
+	PoolingLayer(
+		const int& newSize,
+		const PoolingMethod& _method,
+		const int& poolWidth,
+		const int& poolHeight,
+		ConvolutionLayer*	 _prev = nullptr,
+		LayerBase*			 _next = nullptr
+	);
+
+	virtual void init() override;
+
+	virtual int getSize() const override;
+
+	virtual void calculateActivation() override;
+
+	nlohmann::json toJSON() const override { return nlohmann::json(); };  // dummy
+
+	void printLayerInfo() const override {};  // dummy
+
+	virtual ~PoolingLayer();
+private:
+	PoolingMethod method;
+	int width;
+	int height;
+
+	std::vector<Pool*> pools;
 };
 
 
