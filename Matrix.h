@@ -90,6 +90,7 @@ public:
 
 	int getRows() const { return n; }
 	int getCols() const { return m; }
+	T*  getData() const { return data; }
 
 	T& operator()(const int& i, const int& j) { 
 		/*if (i < 0 || j < 0)
@@ -119,11 +120,16 @@ public:
 		if (temp.getCols() * temp.getRows() > 10000) {
 
 			std::vector<std::future<void>> fut;
+			fut.resize(ThreadPoolWrapper::getThreads());
 			for (int i = 0; i < ThreadPoolWrapper::getThreads(); ++i) {
-				fut.emplace_back(
+				/*fut.emplace_back(
 					ThreadPoolWrapper::getThreadPool().enqueue(
 						getLambda(), this, &rhs, i, ThreadPoolWrapper::getThreads(), &temp
 					)
+				);*/
+
+				fut[i] = ThreadPoolWrapper::getThreadPool().enqueue(
+					getLambda(), this, &rhs, i, ThreadPoolWrapper::getThreads(), &temp
 				);
 			}
 
