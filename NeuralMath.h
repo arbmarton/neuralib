@@ -1,9 +1,12 @@
 #pragma once
 
 #include "Matrix.h"
+#include "FeatureMap.h"
 
 #include <math.h>
 #include <limits>
+
+class FeatureMap;
 
 enum class CostFunction {
 	LeastSquares,
@@ -78,9 +81,11 @@ void convolve(
 	const T* const kernel,
 	const int& kernelX,
 	const int& kernelY,
-	T* result)
+	T* result,
+	const int& resultX,
+	const int& resultY)
 {
-	const int resultX = inputX - 2 * floor(kernelX / 2);
+	//const int resultX = inputX - 2 * floor(kernelX / 2);
 	//const int resultY = inputY - 2 * floor(kernelY);
 
 	for (int xStart = 0; xStart < inputX - kernelX + 1; ++xStart) {
@@ -94,13 +99,24 @@ void convolve(
 				}
 			}
 			
+			std::cout << xStart + yStart*resultX;
 			result[xStart + yStart*resultX] = accum;
 		}
 	}
 }
 
 template<class T>
-void pool(
+void convolve(const Matrix<T>& mat, const FeatureMap& feat)
+{
+	convolve(
+		mat.getData(), mat.getCols(), mat.getRows(),
+		feat.getKernel().getData(), feat.getKernel().getCols(), feat.getKernel().getRows(),
+		feat.getResult().getData(), feat.getResult().getCols(), feat.getResult().getRows()
+	);
+}
+
+template<class T>
+void createPool(
 	const PoolingMethod& pooltype,
 	const int& poolX,
 	const int& poolY,
