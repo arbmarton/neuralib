@@ -83,8 +83,6 @@ private:
 	std::vector<LayerBase*> layers;
 
 	void connectLayers();
-
-	unsigned int threads;
 };
 
 // less typing when constructing a Net from a json

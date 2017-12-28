@@ -6,7 +6,6 @@ Net::Net(NeuralInputClass* input, const CostFunction& cost, const Regularization
 	: inputClass(input)
 	, costFunctionType(cost)
 	, regularizationType(reg)
-	, threads(std::thread::hardware_concurrency())
 {
 	input->init();
 }
@@ -17,13 +16,12 @@ Net::Net(const nlohmann::json& input)
 	, minibatchSize(input["minibatchsize"].get<int>())
 	, eta(input["eta"].get<float>())
 	, regularization(input["regularization"].get<float>())
-	, threads(std::thread::hardware_concurrency())
 {
 	std::vector<nlohmann::json> layersJson = input["layers"].get<std::vector<nlohmann::json>>();
 	layers.resize(layersJson.size());
 
 	for (int i = 0; i < layersJson.size(); ++i) {
-		switch (str2int(layersJson[i]["layertype"].get<std::string>().c_str()))
+		/*switch (str2int(layersJson[i]["layertype"].get<std::string>().c_str()))
 		{
 		case str2int("input"):
 			layers[i] = new InputLayer(layersJson[i]);
@@ -39,6 +37,33 @@ Net::Net(const nlohmann::json& input)
 
 		default:
 			throw NeuralException("cannot parse layertype...");
+			break;
+		}*/
+
+		switch (jsonToLayerType(layersJson[i]))
+		{
+		case LayerType::Input:
+			layers[i] = new InputLayer(layersJson[i]);
+			break;
+
+		case LayerType::General:
+			layers[i] = new Layer(layersJson[i]);
+			break;
+
+		case LayerType::Output:
+			layers[i] = new OutputLayer(layersJson[i]);
+			break;
+
+		case LayerType::Convolutional:
+			layers[i] = new ConvolutionLayer(layersJson[i]);
+			break;
+
+		case LayerType::Pooling:
+			layers[i] = new PoolingLayer(layersJson[i]);
+			break;
+
+		default:
+			throw NeuralException("\ncant parse layertype....\n");
 			break;
 		}
 	}
@@ -102,6 +127,15 @@ void Net::createNewLayer(const int& size, const LayerType& layertype, const int&
 
 		layers.push_back(
 			new ConvolutionLayer(size, width, height, layers[layers.size() - 1])
+		);
+
+		break;
+
+
+	case LayerType::Pooling:
+
+		layers.push_back(
+			new PoolingLayer(size, PoolingMethod::L2, width, height, static_cast<ConvolutionLayer*>(layers[layers.size() - 1]))
 		);
 
 		break;

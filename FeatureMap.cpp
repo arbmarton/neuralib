@@ -17,6 +17,13 @@ FeatureMap::FeatureMap(const int& kernelWidth, const int& kernelHeight, Convolut
 	result = Matrix<float>(resultSide, resultSide);
 }
 
+FeatureMap::FeatureMap(const nlohmann::json& other)
+	: bias(other["bias"].get<float>())
+	, kernel(other["kernel"].get<nlohmann::json>())
+	, result(other["result"].get<nlohmann::json>())
+{
+}
+
 void FeatureMap::init()
 {
 	std::uniform_real_distribution<float> uni(-1, 1);
@@ -34,6 +41,17 @@ Matrix<float> FeatureMap::getKernel() const
 Matrix<float> FeatureMap::getResult() const
 {
 	return result;
+}
+
+nlohmann::json FeatureMap::toJSON()   const
+{
+	nlohmann::json ret;
+
+	ret["bias"]   = bias;
+	ret["kernel"] = kernel.toJSON();
+	ret["result"] = result.toJSON();
+
+	return ret;
 }
 
 FeatureMap::~FeatureMap()

@@ -29,35 +29,37 @@ int main()
 	Timer timer;
 
 	try {
-		/*int i = 25;
-		int k = 5;
+		//int i = 25;
+		//int k = 5;
 
-		int modifier = 0;
-		if (k % 2 == 0) modifier = 1;
+		//int modifier = 0;
+		//if (k % 2 == 0) modifier = 1;
 
-		Matrix<float> input(i, i);
-		input.fillValue(1);
+		//Matrix<float> input(i, i);
+		//input.fillValue(1);
 
-		Matrix<float> kernel(k, k);
-		kernel.fillValue(1);
+		//Matrix<float> kernel(k, k);
+		//kernel.fillValue(1);
 
-		Matrix<float> result(input.getCols() - 2 * floor(kernel.getCols() / 2) + modifier, input.getCols() - 2 * floor(kernel.getCols() / 2) + modifier);
-		result.fillValue(0);
+		//Matrix<float> result(input.getCols() - 2 * floor(kernel.getCols() / 2) + modifier, input.getCols() - 2 * floor(kernel.getCols() / 2) + modifier);
+		//result.fillValue(0);
 
-		convolve(
-			input.getData(),  input.getRows(),  input.getCols(),
-			kernel.getData(), kernel.getRows(), kernel.getCols(),
-			result.getData(), result.getRows(), result.getCols());
+		//convolve(
+		//	input.getData(),  input.getRows(),  input.getCols(),
+		//	kernel.getData(), kernel.getRows(), kernel.getCols(),
+		//	result.getData(), result.getRows(), result.getCols());
 
-		result.print();*/
+		//result.print();
 
-		Net conv(&input, CostFunction::CrossEntropy, Regularization::L2);
-		conv.createNewLayer(784, NeuronType::Input, LayerType::Input);
-		conv.createNewLayer(50,   LayerType::Convolutional, 5, 5);
-		conv.createNewLayer(10,  NeuronType::Sigmoid, LayerType::Output);
+		//Net conv(&input, CostFunction::CrossEntropy, Regularization::L2);
+		//conv.createNewLayer(784, NeuronType::Input, LayerType::Input);
+		//conv.createNewLayer(50,  LayerType::Convolutional, 5, 5);
+		//conv.createNewLayer(50,  LayerType::Pooling, 2, 2);
+		//conv.createNewLayer(100, NeuronType::Sigmoid, LayerType::General);
+		//conv.createNewLayer(10,  NeuronType::Sigmoid, LayerType::Output);
 		
 
-		/*Net network(&input, CostFunction::CrossEntropy, Regularization::L2);
+		Net network(&input, CostFunction::CrossEntropy, Regularization::L2);
 		network.createNewLayer(784,  NeuronType::Input,   LayerType::Input );
 		network.createNewLayer(100,  NeuronType::Sigmoid, LayerType::General);
 		network.createNewLayer(10,   NeuronType::Sigmoid, LayerType::Output);
@@ -66,7 +68,7 @@ int main()
 		network.train(10, 10, 5.0f, 0.001f);
 		timer.createTimePoint("after");
 
-		timer.printTimeDifferenceSec("before", "after");*/
+		timer.printTimeDifferenceSec("before", "after");
 		//network.saveAs("mnist.json");
 
 

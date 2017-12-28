@@ -12,31 +12,37 @@
 #include <vector>
 #include <random>
 
-// TODO: json constructor cleanup
+// TODO: thourough JSON test, io with all the functions
 
 class FeatureMap;
 class Pool;
 enum class CostFunction;
 enum class Regularization;
 enum class PoolingMethod;
+enum class LayerType;
 
-enum class LayerType
+
+// why isnt this working by defining here and forward declaring in neuralmath.h? look into this
+/*enum class LayerType
 {
 	Input,
 	General,
 	Convolutional,
+	Pooling,
 	Output
-};
+};*/
+
+
 
 
 ////////////////////////////////////////////////////////////
 ///// LAYERBASE 
 ////////////////////////////////////////////////////////////
 
-// activation lehet hogy mégsem ebbe kéne
+// best place for activations?
 class LayerBase {
 public:
-	LayerBase(const int& newSize, LayerBase* _prev = nullptr, LayerBase* _next = nullptr);
+	LayerBase(const LayerType& type, const int& newSize, LayerBase* _prev = nullptr, LayerBase* _next = nullptr);
 
 	virtual int getSize() const = 0;
 
@@ -45,7 +51,7 @@ public:
 	virtual void setPreviousLayer(LayerBase* layer);
 	virtual void setNextLayer(LayerBase* layer);
 
-	virtual Matrix<float> getActivations() const;
+	virtual Matrix<float> getActivations() const = 0;
 
 	virtual void calculateActivation() = 0;
 
@@ -56,12 +62,13 @@ public:
 	virtual ~LayerBase() {};
 
 protected:
+	LayerType		layertype;
 	int				size;
 
 	LayerBase*		prev;
 	LayerBase*		next;
 
-	Matrix<float>	activations;
+//	Matrix<float>	activations;
 
 	virtual void init() = 0;
 };
@@ -89,7 +96,7 @@ public:
 	virtual std::vector<Neuron*> getNeurons() const;
 	//virtual Neuron& getNeuron(const int& neuronNumber) const;  // cant return copy: abstract class  // maybe a pointer should be used? 
 
-	//virtual Matrix<float> getActivations() const override;
+	virtual Matrix<float> getActivations() const override;
 	virtual Matrix<float> getBias()		   const;
 	virtual Matrix<float> getZed()		   const;
 	virtual Matrix<float> getDelta()	   const;
@@ -116,10 +123,11 @@ public:
 
 protected:
 	NeuronType				neurontype;
-	LayerType				layertype;
+//	LayerType				layertype;
 
 	std::vector<Neuron*>	neurons;
 
+	Matrix<float>			activations;
 	Matrix<float>			weights;
 	Matrix<float>			biases;
 	Matrix<float>			zed;
@@ -130,7 +138,6 @@ protected:
 	virtual void initWeights();
 	virtual void initBiases();
 };
-
 
 ////////////////////////////////////////////////////////////
 ///// CONVOLUTIONLAYER 
@@ -146,15 +153,18 @@ public:
 		LayerBase* _prev,
 		LayerBase* _next = nullptr
 	);
+	ConvolutionLayer(const nlohmann::json& input);
 
 	virtual void init() override;
 
 	virtual int getSize() const override;
+	int getMapRows() const;
 	std::vector<FeatureMap*>& getMaps();
 
 	virtual void calculateActivation() override;
+	virtual Matrix<float> getActivations() const override { return Matrix<float>(); }
 
-	nlohmann::json toJSON() const override { return nlohmann::json(); };  // dummy
+	nlohmann::json toJSON() const override;
 
 	void printLayerInfo() const override {};  // dummy
 
@@ -183,14 +193,18 @@ public:
 		ConvolutionLayer*	 _prev = nullptr,
 		LayerBase*			 _next = nullptr
 	);
+	PoolingLayer(const nlohmann::json& input);
 
 	virtual void init() override;
 
 	virtual int getSize() const override;
+	int getPoolRows() const;
+	std::vector<Pool*>& getPools();
 
 	virtual void calculateActivation() override;
+	virtual Matrix<float> getActivations() const override { return Matrix<float>(); }
 
-	nlohmann::json toJSON() const override { return nlohmann::json(); };  // dummy
+	nlohmann::json toJSON() const override;  // dummy
 
 	void printLayerInfo() const override {};  // dummy
 
