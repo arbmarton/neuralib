@@ -166,7 +166,7 @@ public:
 
 	nlohmann::json toJSON() const override;
 
-	void printLayerInfo() const override {};  // dummy
+	void printLayerInfo() const override;  // dummy
 
 	virtual ~ConvolutionLayer();
 private:
@@ -204,9 +204,9 @@ public:
 	virtual void calculateActivation() override;
 	virtual Matrix<float> getActivations() const override { return Matrix<float>(); }
 
-	nlohmann::json toJSON() const override;  // dummy
+	nlohmann::json toJSON() const override;
 
-	void printLayerInfo() const override {};  // dummy
+	void printLayerInfo() const override;
 
 	virtual ~PoolingLayer();
 private:

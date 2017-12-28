@@ -445,6 +445,16 @@ nlohmann::json ConvolutionLayer::toJSON() const
 	return ret;
 }
 
+void ConvolutionLayer::printLayerInfo() const
+{
+	std::cout << "Printing ConvolutionLayer:\n";
+	std::cout << "kernelwidth: " << kernelWidth << ", kernelheight: " << kernelHeight << '\n';
+	std::cout << "resultwidth: " << resultWidth << ", resutheight: " << resultHeight << '\n';
+	for (FeatureMap* map : featureMaps) {
+		map->print();
+	}
+}
+
 ConvolutionLayer::~ConvolutionLayer()
 {
 	for (int i = 0; i < size; ++i) {
@@ -558,6 +568,15 @@ nlohmann::json PoolingLayer::toJSON() const
 	ret["pools"] = poolsjson;
 
 	return ret;
+}
+
+void PoolingLayer::printLayerInfo() const
+{
+	std::cout << "Printing PoolingLayer info:\n";
+	std::cout << "width: " << width << ", height: " << height << '\n';
+	for (Pool* pool : pools) {
+		pool->print();
+	}
 }
 
 PoolingLayer::~PoolingLayer()

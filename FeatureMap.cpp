@@ -54,6 +54,16 @@ nlohmann::json FeatureMap::toJSON()   const
 	return ret;
 }
 
+void FeatureMap::print() const
+{
+	std::cout << "Printing FeatureMap:\n";
+	std::cout << "bias: " << bias << '\n';
+	std::cout << "kernel:\n";
+	kernel.print();
+	std::cout << "result:\n";
+	result.print();
+}
+
 FeatureMap::~FeatureMap()
 {
 }

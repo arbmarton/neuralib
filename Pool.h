@@ -21,6 +21,8 @@ public:
 
 	nlohmann::json toJSON()   const;
 
+	void print() const;
+
 	~Pool();
 private:
 	PoolingMethod method;

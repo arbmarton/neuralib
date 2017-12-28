@@ -24,6 +24,8 @@ public:
 
 	nlohmann::json toJSON()	   const;
 
+	void print() const;
+
 	~FeatureMap();
 private:
 	float			bias;

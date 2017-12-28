@@ -83,6 +83,13 @@ nlohmann::json Pool::toJSON() const
 	return ret;
 }
 
+void Pool::print() const
+{
+	std::cout << "Pool object:\n";
+	std::cout << "width: " << width << ", height: " << height << '\n';
+	result.print();
+}
+
 Pool::~Pool()
 {
 }
