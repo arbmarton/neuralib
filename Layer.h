@@ -6,6 +6,7 @@
 #include "NeuralMath.h"
 #include "FeatureMap.h"
 #include "Pool.h"
+#include "Utilities.h"
 
 #include "json.hpp"
 
@@ -16,21 +17,21 @@
 
 class FeatureMap;
 class Pool;
+class Neuron;
 enum class CostFunction;
 enum class Regularization;
 enum class PoolingMethod;
 enum class LayerType;
+enum class NeuronType;
 
-
-// why isnt this working by defining here and forward declaring in neuralmath.h? look into this
-/*enum class LayerType
+enum class LayerType
 {
 	Input,
 	General,
 	Convolutional,
 	Pooling,
 	Output
-};*/
+};
 
 
 
