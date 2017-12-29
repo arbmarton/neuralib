@@ -15,6 +15,7 @@ enum class NeuronType
 {
 	Input,
 	Sigmoid,
+	Softmax,
 	/* ... */
 	Output
 };

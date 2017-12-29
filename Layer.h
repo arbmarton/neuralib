@@ -14,6 +14,7 @@
 #include <random>
 
 // TODO: thourough JSON test, io with all the functions
+// TODO: implement softmax layer
 
 class FeatureMap;
 class Pool;
@@ -279,6 +280,7 @@ public:
 	void setIdealOutput(const std::function<void(std::vector<float>&)>& func);
 	Matrix<float> getIdealOutput() const;
 
+	void calculateActivation() override;
 	void calculateDelta() override;
 
 	void resetCounters() { correct = 0; notCorrect = 0; }

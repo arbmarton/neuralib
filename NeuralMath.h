@@ -50,6 +50,50 @@ Matrix<T> sigmoid(const Matrix<T>& input)
 	return ret;
 }
 
+/*template<class T>
+float tanh(const T& input)
+{
+	const float arg1 = exp(input);
+	const float arg2 = exp(-input);
+
+	const float ret = (arg1 - arg2) / (arg1 + arg2);
+	return (ret + 1) / 2;
+}*/
+
+template<class T>
+Matrix<T> tanh(const Matrix<T>& input)
+{
+	Matrix<T> ret(input.getRows(), input.getCols());
+
+	for (int i = 0; i < input.getRows(); ++i) {
+		for (int j = 0; j < input.getCols(); ++j) {
+			ret(i, j) = tanh(input(i, j));
+		}
+	}
+
+	return ret;
+}
+
+template<class T>
+float relu(const T& input)
+{
+	return std::max(T(0), input);
+}
+
+template<class T>
+Matrix<T> relu(const Matrix<T>& input)
+{
+	Matrix<T> ret(input.getRows(), input.getCols());
+
+	for (int i = 0; i < input.getRows(); ++i) {
+		for (int j = 0; j < input.getCols(); ++j) {
+			ret(i, j) = relu(input(i, j));
+		}
+	}
+
+	return ret;
+}
+
 template<class T>
 float sigmoidDerivative(const T& input)
 {
@@ -76,6 +120,32 @@ template<class T>
 Matrix<T> crossEntropy(const Matrix<T>& input)
 {
 	
+}
+
+// this should only get positive matrices
+template<class T>
+Matrix<T> softMax(const Matrix<T>& input)
+{
+	Matrix<T> ret(input.getRows(), input.getCols());
+
+	T accum = T(0);
+	for (int i = 0; i < input.getRows(); ++i) {
+		for (int j = 0; j < input.getCols(); ++j) {
+			accum += input(i, j);
+		}
+	}
+
+	for (int i = 0; i < input.getRows(); ++i) {
+		for (int j = 0; j < input.getCols(); ++j) {
+			ret(i, j) = input(i, j) / accum;
+		}
+	}
+
+	if (accum < 0) {
+	//	std::cout << "\naccum was negative: " << accum << '\n';
+	}
+
+	return ret;
 }
 
 // do i need to prepare for inputX != inputY?

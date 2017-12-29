@@ -72,7 +72,8 @@ Layer::Layer(
 	switch (newNeuronType)
 	{
 
-	case NeuronType::Sigmoid:
+	case NeuronType::Sigmoid:			// intentional fallthrough
+	case NeuronType::Softmax:
 		for (int i = 0; i < newSize; ++i) {
 			neurons[i] = new Sigmoid();
 		}
@@ -698,6 +699,25 @@ Matrix<float> OutputLayer::getIdealOutput() const
 	return Matrix<float>(vec);
 }
 
+void OutputLayer::calculateActivation()
+{
+	Matrix<float> temp = weights * (dynamic_cast<Layer*>(prev)->getActivations());
+	//temp += biases;
+
+	zed = temp + biases;
+
+	if (neurontype == NeuronType::Softmax) {
+		activations = softMax(zed);
+		return;
+	}
+	else {
+		for (int i = 0; i < activations.getRows(); ++i) {
+			activations(i, 0) = sigmoid(-zed(i, 0));
+
+			//neurons[i]->setResult(activations(i, 0));
+		}
+	}
+}
 
 void OutputLayer::calculateDelta()
 {
@@ -732,7 +752,13 @@ void OutputLayer::calculateDelta()
 
 void OutputLayer::initBiases()
 {
-	biases = Matrix<float>(biases.getRows(), biases.getCols());
+	if (neurontype == NeuronType::Softmax) {
+		//biases = Matrix<float>(biases.getRows(), biases.getCols());
+		biases.fillValue(float(0));
+	}
+	else {
+		biases.fillGaussNormalized(0, 1, prev->getSize());
+	}
 }
 
 void OutputLayer::printLayerInfo() const
