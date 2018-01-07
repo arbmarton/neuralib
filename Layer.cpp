@@ -209,7 +209,7 @@ void Layer::calculateDelta()
 {
 	auto nextPtr = dynamic_cast<Layer*>(next);
 	delta = hadamardProduct(
-		transpose(nextPtr->weights)*nextPtr->delta,
+		transpose(nextPtr->weights) * nextPtr->delta, 
 		sigmoidDerivative(zed)
 	);
 }
@@ -251,7 +251,6 @@ void Layer::update(
 
 		break;
 	}
-	
 }
 
 void Layer::printLayerInfo() const
@@ -272,6 +271,13 @@ void Layer::printLayerInfo() const
 	std::string size = std::to_string(neurons.size());
 
 	std::cout << "Layertype: " + type + "\nNeurontype: " + _neurontype + "\nLayersize: " + size << "\n\n";
+}
+
+void Layer::printLayer() const
+{
+	for (Neuron* neuron : neurons) {
+		std::cout << neuron->getResult() << '\n';
+	}
 }
 
 void Layer::init()
@@ -371,6 +377,18 @@ ConvolutionLayer::ConvolutionLayer(
 	, kernelWidth(width)
 	, kernelHeight(height)
 {
+	if (dynamic_cast<InputLayer*>(_prev)) {
+		const int prevSize = sqrt(_prev->getActivations().getRows());
+		input = Matrix<float>(prevSize, prevSize);
+	}
+	else {
+		// if we convolve from a general layer what should happen?
+		throw NeuralException("\ni didnt implement this yet\n");
+	}
+
+	resultWidth  = input.getCols() - kernelWidth  + 1;
+	resultHeight = input.getRows() - kernelHeight + 1;
+
 	featureMaps.resize(newSize);
 	init();
 }
@@ -393,7 +411,7 @@ ConvolutionLayer::ConvolutionLayer(const nlohmann::json& input)
 void ConvolutionLayer::init()
 {
 	for (FeatureMap*& feat : featureMaps) {
-		feat = new FeatureMap(kernelWidth, kernelHeight, this);
+		feat = new FeatureMap(kernelWidth, kernelHeight, resultWidth, resultHeight, this);
 		feat->init();
 	}
 	/*for (int i = 0; i < featureMaps.size(); ++i) {
@@ -420,7 +438,7 @@ std::vector<FeatureMap*>& ConvolutionLayer::getMaps()
 void ConvolutionLayer::calculateActivation()
 {
 	for (FeatureMap* feat : featureMaps) {
-		convolve(prev->getActivations(), *feat);
+		validConvolution(input, *feat);
 	}
 }
 
@@ -449,8 +467,15 @@ nlohmann::json ConvolutionLayer::toJSON() const
 void ConvolutionLayer::printLayerInfo() const
 {
 	std::cout << "Printing ConvolutionLayer:\n";
+	std::cout << "inputwidth: " << input.getCols() << ", inputheight: " << input.getRows() << '\n';
 	std::cout << "kernelwidth: " << kernelWidth << ", kernelheight: " << kernelHeight << '\n';
 	std::cout << "resultwidth: " << resultWidth << ", resutheight: " << resultHeight << '\n';
+	std::cout << "\n";
+}
+
+void ConvolutionLayer::printLayer() const
+{
+	std::cout << "Printing ConvolutionLayer:\n";
 	for (FeatureMap* map : featureMaps) {
 		map->print();
 	}
@@ -575,6 +600,12 @@ void PoolingLayer::printLayerInfo() const
 {
 	std::cout << "Printing PoolingLayer info:\n";
 	std::cout << "width: " << width << ", height: " << height << '\n';
+	std::cout << "\n";
+}
+
+void PoolingLayer::printLayer() const
+{
+	std::cout << "Pinting pooling layer:\n";
 	for (Pool* pool : pools) {
 		pool->print();
 	}
@@ -747,7 +778,6 @@ void OutputLayer::calculateDelta()
 		throw NeuralException("Invalid costfunction type...");
 		break;
 	}
-
 }
 
 void OutputLayer::initBiases()

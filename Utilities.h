@@ -9,4 +9,4 @@ enum class PoolingMethod;
 enum class LayerType;
 
 PoolingMethod jsonToPoolingMethod(const nlohmann::json& input);
-LayerType jsonToLayerType(const nlohmann::json& input);
+LayerType	  jsonToLayerType(const nlohmann::json& input);

@@ -340,12 +340,13 @@ void Net::updateWeightsAndBiases(
 
 void Net::printLayer(const int& layerNumber) const
 {
-	Layer* out = static_cast<Layer*>(getLayer(layerNumber));
+	//Layer* out = static_cast<Layer*>(getLayer(layerNumber));
 
 	std::cout << "Printing layer number: " << layerNumber << "...\n";
-	for (Neuron* neuron : out->getNeurons()) {
+	/*for (Neuron* neuron : out->getNeurons()) {
 		std::cout << neuron->getResult() << '\n';
-	}
+	}*/
+	getLayer(layerNumber)->printLayer();
 
 	std::cout << "\n\n";
 }

@@ -11,6 +11,7 @@
 #include "Matrix.h"
 #include "NeuralInputClass.h"
 #include "Timer.h"
+#include "NeuralMath.h"
 
 #include "json.hpp"
 
@@ -57,7 +58,9 @@ int main()
 		//conv.createNewLayer(50,  LayerType::Pooling, 2, 2);
 		//conv.createNewLayer(100, NeuronType::Sigmoid, LayerType::General);
 		//conv.createNewLayer(10,  NeuronType::Sigmoid, LayerType::Output);
-		
+
+		//conv.printLayerInfo();
+
 
 		Net network(&input, CostFunction::CrossEntropy, Regularization::L2);
 		network.createNewLayer(784,  NeuronType::Input,   LayerType::Input );
@@ -69,7 +72,7 @@ int main()
 		timer.createTimePoint("after");
 
 		timer.printTimeDifferenceSec("before", "after");
-		//network.saveAs("mnist.json");
+		//network.saveAs("mnist2.json");
 
 
 		//Net cpy(getJson("net.json"));

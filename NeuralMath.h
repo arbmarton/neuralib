@@ -150,7 +150,7 @@ Matrix<T> softMax(const Matrix<T>& input)
 
 // do i need to prepare for inputX != inputY?
 template<class T>
-void convolve(
+void validConvolution(
 	const T* const input,
 	const int& inputX,
 	const int& inputY,
@@ -182,13 +182,19 @@ void convolve(
 }
 
 template<class T>
-void convolve(const Matrix<T>& mat, const FeatureMap& feat)
+void validConvolution(const Matrix<T>& mat, const FeatureMap& feat)
 {
-	convolve(
+	validConvolution(
 		mat.getData(), mat.getCols(), mat.getRows(),
 		feat.getKernel().getData(), feat.getKernel().getCols(), feat.getKernel().getRows(),
 		feat.getResult().getData(), feat.getResult().getCols(), feat.getResult().getRows()
 	);
+}
+
+template<class T>
+void fullConvolution(const Matrix<T>& kernel, const Matrix<T>& delta)
+{
+
 }
 
 template<class T>

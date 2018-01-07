@@ -292,7 +292,20 @@ public:
 
 		for (int i = 0; i < n; ++i) {
 			for (int j = 0; j < m; ++j) {
-				temp(i, j) = sgn(data[i]);
+				temp(i, j) = sgn(data[i*m + j]);
+			}
+		}
+
+		return temp;
+	}
+
+	// this is used in convolutional backpropagation
+	Matrix<T> rotate180() const {
+		Matrix<T> temp(*this);
+
+		for (int i = 0; i < n; ++i) {
+			for (int j = 0; j < m; ++j) {
+				temp(i, j) = (*this)(n - i - 1, m - j - 1);
 			}
 		}
 

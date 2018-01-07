@@ -2,19 +2,30 @@
 #include "FeatureMap.h"
 
 
-FeatureMap::FeatureMap(const int& kernelWidth, const int& kernelHeight, ConvolutionLayer* _parent)
+FeatureMap::FeatureMap(
+	const int& kernelWidth,
+	const int& kernelHeight,
+	const int& resultWidth,
+	const int& resultHeight,
+	ConvolutionLayer* _parent)
 	: kernel(Matrix<float>(kernelHeight, kernelWidth))
-	, parent(_parent)
+	, kernelRotated(Matrix<float>(kernelHeight, kernelWidth))
+	, result(Matrix<float>(resultHeight, resultWidth))
 {
-	const int prevActivations = _parent->getPreviousLayer()->getActivations().getRows();
-	const int inputSide = sqrt(prevActivations);
-	int resultSide = inputSide - 2 * floor(kernelWidth / 2);
-	
-	if (kernelWidth % 2 == 0) {
-		resultSide += 1;
-	}
+	//const int prevActivations = _parent->getPreviousLayer()->getActivations().getRows();
+	//const int inputSide = sqrt(prevActivations);
+	//int resultSide = inputSide - 2 * floor(kernelWidth / 2);
+	//
+	//if (kernelWidth % 2 == 0) {
+	//	resultSide += 1;
+	//}
 
-	result = Matrix<float>(resultSide, resultSide);
+	//result = Matrix<float>(resultSide, resultSide);
+
+	//result = Matrix<float>(
+	//	_parent->getPreviousLayer()->getActivations().getRows() - kernelHeight - 1,
+	//	_parent->getPreviousLayer()->getActivations().getCols() - kernelWidth  - 1
+	//	);
 }
 
 FeatureMap::FeatureMap(const nlohmann::json& other)
@@ -27,10 +38,10 @@ FeatureMap::FeatureMap(const nlohmann::json& other)
 void FeatureMap::init()
 {
 	std::uniform_real_distribution<float> uni(-1, 1);
-
 	bias = uni(Random::getMT());
-
 	kernel.fillGauss(0, 1);
+
+	kernelRotated = kernel.rotate180();
 }
 
 Matrix<float> FeatureMap::getKernel() const

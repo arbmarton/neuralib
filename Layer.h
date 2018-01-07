@@ -15,6 +15,8 @@
 
 // TODO: thourough JSON test, io with all the functions
 // TODO: implement softmax layer
+// TODO: feature map output: H-kernelheight+1? correct?
+// TODO: check out signum in Matrix.h, is it correct?
 
 class FeatureMap;
 class Pool;
@@ -58,6 +60,7 @@ public:
 	virtual void calculateActivation() = 0;
 
 	virtual void printLayerInfo() const = 0;
+	virtual void printLayer() const = 0;
 
 	virtual nlohmann::json toJSON() const = 0;
 
@@ -118,6 +121,7 @@ public:
 	);
 
 	virtual void printLayerInfo() const override;
+	virtual void printLayer() const override;
 
 	virtual nlohmann::json toJSON() const override;
 
@@ -168,10 +172,13 @@ public:
 
 	nlohmann::json toJSON() const override;
 
-	void printLayerInfo() const override;  // dummy
+	void printLayerInfo() const override;
+	void printLayer() const override;
 
 	virtual ~ConvolutionLayer();
 private:
+	Matrix<float> input;
+
 	std::vector<FeatureMap*> featureMaps;
 	int kernelWidth;
 	int kernelHeight;
@@ -209,6 +216,7 @@ public:
 	nlohmann::json toJSON() const override;
 
 	void printLayerInfo() const override;
+	void printLayer() const override;
 
 	virtual ~PoolingLayer();
 private:

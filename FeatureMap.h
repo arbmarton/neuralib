@@ -9,12 +9,18 @@
 
 class ConvolutionLayer;
 
-//TODO: parent useless?
+// TODO: parent useless?
+// TODO: get methods for the rotated kernel
 
 class FeatureMap
 {
 public:
-	FeatureMap(const int& kernelWidth, const int& kernelHeight, ConvolutionLayer* _parent);
+	FeatureMap(
+		const int& kernelWidth,
+		const int& kernelHeight,
+		const int& resultWidth,
+		const int& resultHeight,
+		ConvolutionLayer* _parent);
 	FeatureMap(const nlohmann::json& other);
 
 	void	init();
@@ -30,8 +36,7 @@ public:
 private:
 	float			bias;
 	Matrix<float>	kernel;
+	Matrix<float>	kernelRotated;
 	Matrix<float>	result;
-
-	ConvolutionLayer* parent;
 };
 
