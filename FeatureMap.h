@@ -37,6 +37,7 @@ private:
 	float			bias;
 	Matrix<float>	kernel;
 	Matrix<float>	kernelRotated;
-	Matrix<float>	result;
+	Matrix<float>	result;  //maybe rename to activation?
+	Matrix<float>	delta;
 };
 

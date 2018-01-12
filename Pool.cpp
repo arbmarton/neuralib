@@ -16,6 +16,7 @@ Pool::Pool(const PoolingMethod& _method, const int& kernelWidth, const int& kern
 	const int resultWidth = previousWidth / kernelWidth;
 
 	result = Matrix<float>(resultWidth, resultWidth);
+	delta = result;
 }
 
 Pool::Pool(const nlohmann::json& input)

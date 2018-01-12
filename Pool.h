@@ -30,6 +30,7 @@ private:
 	int height;
 
 	Matrix<float> result;
+	Matrix<float> delta;
 
 	PoolingLayer* parent;
 };
