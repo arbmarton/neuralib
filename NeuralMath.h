@@ -175,7 +175,7 @@ void validConvolution(
 				}
 			}
 			
-			std::cout << xStart + yStart*resultX;
+//			std::cout << xStart + yStart*resultX;
 			result[xStart + yStart*resultX] = accum;
 		}
 	}
@@ -191,10 +191,27 @@ void validConvolution(const Matrix<T>& mat, const FeatureMap& feat)
 	);
 }
 
+// pad the input with zeroes and do a validconvolution
 template<class T>
-void fullConvolution(const Matrix<T>& kernel, const Matrix<T>& delta)
+Matrix<T> fullConvolution(const Matrix<T>& kernel, const Matrix<T>& delta)
 {
+	Matrix<T> ret(delta.getRows() + kernel.getRows() - 1, delta.getCols() + kernel.getCols() - 1);
+	Matrix<T> rotatedKernel = kernel.rotate180();
+	Matrix<T> paddedInput(delta.getRows() + kernel.getRows() * 2 - 2, delta.getCols() + kernel.getCols() * 2 - 2);
+	
+	for (int i = 0; i < delta.getRows(); ++i) {
+		for (int j = 0; j < delta.getCols(); ++j) {
+			paddedInput(i + kernel.getRows() - 1, j + kernel.getCols() - 1) = delta(i, j);
+		}
+	}
 
+	validConvolution(
+		paddedInput.getData(), paddedInput.getCols(), paddedInput.getRows(),
+		rotatedKernel.getData(), rotatedKernel.getCols(), rotatedKernel.getRows(),
+		ret.getData(), ret.getCols(), ret.getRows()
+	);
+
+	return ret;
 }
 
 template<class T>
