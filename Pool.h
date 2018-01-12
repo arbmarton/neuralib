@@ -5,6 +5,8 @@
 
 #include "json.hpp"
 
+#include <vector>
+
 enum class PoolingMethod;
 
 class PoolingLayer;
@@ -31,6 +33,7 @@ private:
 
 	Matrix<float> result;
 	Matrix<float> delta;
+	std::vector<std::pair<int, int>> errorLocations;	// where to send the error back in the previous layer, matrix coordinates
 
 	PoolingLayer* parent;
 };

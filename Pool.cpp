@@ -17,6 +17,8 @@ Pool::Pool(const PoolingMethod& _method, const int& kernelWidth, const int& kern
 
 	result = Matrix<float>(resultWidth, resultWidth);
 	delta = result;
+
+	errorLocations.resize(result.getSize());
 }
 
 Pool::Pool(const nlohmann::json& input)
