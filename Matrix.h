@@ -91,6 +91,7 @@ public:
 
 	int getRows() const { return n; }
 	int getCols() const { return m; }
+	int getSize() const { return n*m; }
 	T*  getData() const { return data; }
 
 	T& operator()(const int& i, const int& j) { 
