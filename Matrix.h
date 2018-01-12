@@ -7,6 +7,7 @@
 #include <iostream>
 #include <random>
 #include <thread>
+#include <iomanip>
 
 template<class T>
 class Matrix
@@ -450,7 +451,7 @@ inline std::ostream& operator<<(std::ostream& os, const Matrix<T>& mat)
 {
 	for (int i = 0; i < mat.getRows(); ++i) {
 		for (int j = 0; j < mat.getCols(); ++j) {
-			std::cout << mat(i, j) << ' ';
+			std::cout << std::setw(2) << mat(i, j) << ' ';
 		}
 		std::cout << '\n';
 	}
