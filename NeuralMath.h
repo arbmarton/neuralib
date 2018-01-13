@@ -157,7 +157,7 @@ void validConvolution(
 	const T* const kernel,
 	const int& kernelX,
 	const int& kernelY,
-	T* result,
+	T* const result,
 	const int& resultX,
 	const int& resultY)
 {
@@ -182,12 +182,12 @@ void validConvolution(
 }
 
 template<class T>
-void validConvolution(const Matrix<T>& mat, const FeatureMap& feat)
+void validConvolution(const Matrix<T>& mat, FeatureMap* feat)
 {
 	validConvolution(
 		mat.getData(), mat.getCols(), mat.getRows(),
-		feat.getKernel().getData(), feat.getKernel().getCols(), feat.getKernel().getRows(),
-		feat.getResult().getData(), feat.getResult().getCols(), feat.getResult().getRows()
+		feat->getKernel().getData(), feat->getKernel().getCols(), feat->getKernel().getRows(),
+		feat->getResult().getData(), feat->getResult().getCols(), feat->getResult().getRows()
 	);
 }
 
@@ -278,7 +278,7 @@ void createPool(
 
 // if i inline it it wont compile, why?
 template<int T = 0>
-void createPool(const PoolingMethod& pooltype, const FeatureMap* const feat, const Pool* pool)
+void createPool(const PoolingMethod& pooltype, FeatureMap* feat, Pool* pool)
 {
 	createPool(
 		pooltype, pool->getWidth(), pool->getHeight(),
