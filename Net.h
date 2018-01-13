@@ -42,6 +42,7 @@ public:
 
 	void addInputClass(NeuralInputClass* inputclass);
 
+	void testForward();
 	void train(
 		const int&        epochNumber,
 		const int&        minibatchSizeParam,

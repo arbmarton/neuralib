@@ -217,6 +217,17 @@ void Net::connectLayers()
 	}
 }
 
+void Net::testForward()
+{
+	inputClass->shuffle();
+	inputClass->resetCounter();
+	dynamic_cast<OutputLayer*>(getLastLayer())->resetCounters();
+
+	calculateActivationInAllLayers();
+
+	printOutputLayer();
+}
+
 void Net::train(
 	const int&        epochNumber,
 	const int&        minibatchSizeParam,
@@ -291,7 +302,7 @@ void Net::work()
 void Net::calculateActivationInAllLayers() const
 {
 	for (LayerBase* layer : layers) {
-		static_cast<Layer*>(layer)->calculateActivation();
+		layer->calculateActivation();
 	}
 }
 
@@ -356,9 +367,11 @@ void Net::printOutputLayer() const
 	Layer* out = static_cast<Layer*>(getLayer(LayerType::Output));
 
 	std::cout << "Printing output layer...\n";
-	for (Neuron* neuron : out->getNeurons()) {
-		std::cout << neuron->getResult() << '\n';
-	}
+	//for (Neuron* neuron : out->getNeurons()) {
+		//std::cout << neuron->getResult() << '\n';
+		
+	//}
+	out->getActivations().print();
 
 	std::cout << "\n\n";
 }
