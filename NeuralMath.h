@@ -27,6 +27,7 @@ enum class Regularization
 enum class PoolingMethod
 {
 	max,
+	average,
 	L2
 };
 
@@ -247,6 +248,23 @@ void createPool(
 						}
 					}
 				}
+
+				break;
+
+			case PoolingMethod::average:
+
+				accum = T(0);
+
+				for (int k = i*poolX; k < (i + 1)*poolX; ++k) {
+					for (int l = j*poolY; l < (j + 1)*poolY; ++l) {
+
+						T temp = input[k + l*inputX];
+
+						accum += temp;
+					}
+				}
+
+				accum /= float(poolX*poolY);
 
 				break;
 
