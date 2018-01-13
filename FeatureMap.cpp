@@ -45,12 +45,12 @@ void FeatureMap::init()
 	kernelRotated = kernel.rotate180();
 }
 
-Matrix<float> FeatureMap::getKernel() const
+Matrix<float>& FeatureMap::getKernel()
 {
 	return kernel;
 }
 
-Matrix<float> FeatureMap::getResult() const
+Matrix<float>& FeatureMap::getResult()
 {
 	return result;
 }
