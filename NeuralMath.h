@@ -276,13 +276,14 @@ void createPool(
 	}
 }
 
-template<class T>
-void createPool(const PoolingMethod& pooltype, const FeatureMap& feat, const Pool& pool)
+// if i inline it it wont compile, why?
+template<int T = 0>
+void createPool(const PoolingMethod& pooltype, const FeatureMap* const feat, const Pool* pool)
 {
 	createPool(
-		pooltype, pool.getWidth(), pool.getHeight(),
-		feat.getResult(), feat.getResult().getCols(), feat.getResult().getRows(),
-		pool.getResult(), pool.getResult().getCols(), pool.getResult().getRows()
+		pooltype, pool->getWidth(), pool->getHeight(),
+		feat->getResult().getData(), feat->getResult().getCols(), feat->getResult().getRows(),
+		pool->getResult().getData(), pool->getResult().getCols(), pool->getResult().getRows()
 	);
 }
 
