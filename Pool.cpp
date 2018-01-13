@@ -52,7 +52,7 @@ int Pool::getHeight() const
 	return height;
 }
 
-Matrix<float> Pool::getResult() const
+Matrix<float>& Pool::getResult()
 {
 	return result;
 }

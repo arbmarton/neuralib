@@ -17,9 +17,9 @@ public:
 	Pool(const PoolingMethod& _method, const int& kernelWidth, const int& kernelHeight, const PoolingLayer* _parent);
 	Pool(const nlohmann::json& input);
 
-	int			  getWidth()  const;
-	int			  getHeight() const;
-	Matrix<float> getResult() const;
+	int			   getWidth()  const;
+	int			   getHeight() const;
+	Matrix<float>& getResult();		// returns a reference because of the way the pooling is done
 
 	nlohmann::json toJSON()   const;
 
