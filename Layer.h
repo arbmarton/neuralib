@@ -13,10 +13,12 @@
 #include <vector>
 #include <random>
 
+// TODO: complete the feedforward cycle and test it
+
 // TODO: thourough JSON test, io with all the functions
 // TODO: implement softmax layer
 // TODO: feature map output: H-kernelheight+1? correct?
-// TODO: check out signum in Matrix.h, is it correct?
+// TODO: maybe fullconvolution should be void?
 
 class FeatureMap;
 class Pool;
@@ -58,6 +60,7 @@ public:
 	virtual Matrix<float> getActivations() const = 0;
 
 	virtual void calculateActivation() = 0;
+	virtual void calculateDelta() = 0;
 
 	virtual void printLayerInfo() const = 0;
 	virtual void printLayer() const = 0;
@@ -109,7 +112,7 @@ public:
 	virtual Matrix<float> getCostWeight()  const;
 
 	virtual void calculateActivation() override;
-	virtual void calculateDelta();
+	virtual void calculateDelta() override;
 	virtual void calculateCostWeight();
 	virtual void update(
 		const Regularization& regMethod,
@@ -168,6 +171,8 @@ public:
 	std::vector<FeatureMap*>& getMaps();
 
 	virtual void calculateActivation() override;
+	virtual void calculateDelta() override;
+
 	virtual Matrix<float> getActivations() const override { return Matrix<float>(); }
 
 	nlohmann::json toJSON() const override;
@@ -211,6 +216,8 @@ public:
 	std::vector<Pool*>& getPools();
 
 	virtual void calculateActivation() override;
+	virtual void calculateDelta() override;
+
 	virtual Matrix<float> getActivations() const override { return Matrix<float>(); }
 
 	nlohmann::json toJSON() const override;

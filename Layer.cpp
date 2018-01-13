@@ -204,7 +204,7 @@ void Layer::calculateActivation()
 		//neurons[i]->setResult(activations(i, 0));
 	}
 }
-
+//
 void Layer::calculateDelta()
 {
 	auto nextPtr = dynamic_cast<Layer*>(next);
@@ -442,6 +442,14 @@ void ConvolutionLayer::calculateActivation()
 	}
 }
 
+void ConvolutionLayer::calculateDelta()
+{
+	auto nextPtr = next;
+	for (FeatureMap* feat : featureMaps) {
+		
+	}
+}
+
 nlohmann::json ConvolutionLayer::toJSON() const
 {
 	nlohmann::json ret;
@@ -552,13 +560,19 @@ std::vector<Pool*>& PoolingLayer::getPools()
 void PoolingLayer::calculateActivation()
 {
 	ConvolutionLayer* previous = static_cast<ConvolutionLayer*>(prev);
+	if (!previous) {
+		throw NeuralException("\nPoolinglayer has to come after a ConvolutionLayer\n");
+	}
 
 	for (int i = 0; i < pools.size(); ++i) {
-		/*createPool(
-			method, width, height,
-			previous->getMaps()[i], 1, 1,
-			pools[i].getResult, 1, 1);*/
+		createPool(method, previous->getMaps()[i], pools[i]);
 	}
+
+}
+
+void PoolingLayer::calculateDelta()
+{
+
 }
 
 nlohmann::json PoolingLayer::toJSON() const
