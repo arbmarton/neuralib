@@ -456,6 +456,7 @@ void ConvolutionLayer::calculateActivation()
 
 	for (int i = 0; i < featureMaps.size(); ++i) {
 		validConvolution(input, featureMaps[i]);
+		featureMaps[i]->applyBias();
 	}
 }
 

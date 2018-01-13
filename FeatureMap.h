@@ -27,6 +27,9 @@ public:
 
 	Matrix<float>&  getKernel();		// returns a reference because of the way the convolving is done
 	Matrix<float>&  getResult();		// returns a reference because of the way the convolving is done
+	float			getBias() const;
+
+	void applyBias();
 
 	nlohmann::json toJSON()	   const;
 

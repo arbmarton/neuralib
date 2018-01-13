@@ -173,6 +173,14 @@ public:
 		return *this;
 	}
 
+	Matrix& operator+=(const float& rhs) {
+		for (int i = 0; i < n*m; ++i) {
+			data[i] += rhs;
+		}
+
+		return *this;
+	}
+
 	Matrix& operator-=(const Matrix& rhs) {
 		/*if (n != rhs.n || m != rhs.m)
 			throw NeuralException("Matrix dimension mismatch in addition...");*/
@@ -181,6 +189,14 @@ public:
 			for (int j = 0; j < m; ++j) {
 				data[i*m + j] -= rhs(i, j);
 			}
+		}
+
+		return *this;
+	}
+
+	Matrix& operator-=(const float& rhs) {
+		for (int i = 0; i < n*m; ++i) {
+			data[i] -= rhs;
 		}
 
 		return *this;
@@ -389,7 +405,21 @@ inline Matrix<T> operator+(Matrix<T> lhs, const Matrix<T>& rhs)
 }
 
 template<class T>
+inline Matrix<T> operator+(Matrix<T> lhs, const float& rhs)
+{
+	lhs += rhs;
+	return lhs;
+}
+
+template<class T>
 inline Matrix<T> operator-(Matrix<T> lhs, const Matrix<T>& rhs)
+{
+	lhs -= rhs;
+	return lhs;
+}
+
+template<class T>
+inline Matrix<T> operator-(Matrix<T> lhs, const float& rhs)
 {
 	lhs -= rhs;
 	return lhs;

@@ -14,8 +14,8 @@
 #include <random>
 
 // TODO: complete the feedforward cycle and test it
-	// featuremap: why do the convolution results vanish?
 
+// TODO: errorlocations in the pooling layer
 // TODO: thourough JSON test, io with all the functions
 // TODO: implement softmax layer
 // TODO: feature map output: H-kernelheight+1? correct?

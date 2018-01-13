@@ -8,7 +8,8 @@ FeatureMap::FeatureMap(
 	const int& resultWidth,
 	const int& resultHeight,
 	ConvolutionLayer* _parent)
-	: kernel(Matrix<float>(kernelHeight, kernelWidth))
+	: bias(0.0f)
+	, kernel(Matrix<float>(kernelHeight, kernelWidth))
 	, kernelRotated(Matrix<float>(kernelHeight, kernelWidth))
 	, result(Matrix<float>(resultHeight, resultWidth))
 	, delta(Matrix<float>(resultHeight, resultWidth))
@@ -53,6 +54,16 @@ Matrix<float>& FeatureMap::getKernel()
 Matrix<float>& FeatureMap::getResult()
 {
 	return result;
+}
+
+float FeatureMap::getBias() const
+{
+	return bias;
+}
+
+void FeatureMap::applyBias()
+{
+	result += bias;
 }
 
 nlohmann::json FeatureMap::toJSON()   const
