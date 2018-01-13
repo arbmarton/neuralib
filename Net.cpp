@@ -119,7 +119,12 @@ void Net::createNewLayer(const int& size, const NeuronType& neuronType, const La
 	connectLayers();
 }
 
-void Net::createNewLayer(const int& size, const LayerType& layertype, const int& width, const int& height)
+void Net::createNewLayer(
+	const int& size,
+	const LayerType& layertype,
+	const int& width,
+	const int& height,
+	const PoolingMethod& pooling)
 {
 	switch (layertype)
 	{
@@ -135,7 +140,7 @@ void Net::createNewLayer(const int& size, const LayerType& layertype, const int&
 	case LayerType::Pooling:
 
 		layers.push_back(
-			new PoolingLayer(size, PoolingMethod::L2, width, height, static_cast<ConvolutionLayer*>(layers[layers.size() - 1]))
+			new PoolingLayer(size, pooling, width, height, static_cast<ConvolutionLayer*>(layers[layers.size() - 1]))
 		);
 
 		break;

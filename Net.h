@@ -33,7 +33,8 @@ public:
 		const int& size,
 		const LayerType& layertype,
 		const int& width,
-		const int& heights
+		const int& heights,
+		const PoolingMethod& pooling = PoolingMethod::average
 	);
 
 	LayerBase* getLayer(const int& layerNumber) const;
