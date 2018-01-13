@@ -193,8 +193,16 @@ Matrix<float> Layer::getCostWeight() const
 
 void Layer::calculateActivation()
 {
-	Matrix<float> temp = weights * (dynamic_cast<Layer*>(prev)->activations);
-	//temp += biases;
+	Matrix<float> temp;
+	if (dynamic_cast<Layer*>(prev)) {
+		temp = weights * (dynamic_cast<Layer*>(prev)->activations);
+		//temp += biases;
+
+
+	}
+	else {
+		temp = weights * dynamic_cast<PoolingLayer*>(prev)->getActivations();
+	}
 
 	zed = temp + biases;
 
@@ -437,8 +445,17 @@ std::vector<FeatureMap*>& ConvolutionLayer::getMaps()
 
 void ConvolutionLayer::calculateActivation()
 {
-	for (FeatureMap* feat : featureMaps) {
+	for (int i = 0; i < input.getRows(); ++i) {
+		for (int j = 0; j < input.getCols(); ++j) {
+			input(i, j) = prev->getActivations()(i*input.getCols() + j, 0);
+		}
+	}
+	/*for (FeatureMap*& feat : featureMaps) {
 		validConvolution(input, *feat);
+	}*/
+
+	for (int i = 0; i < featureMaps.size(); ++i) {
+		validConvolution(input, featureMaps[i]);
 	}
 }
 
@@ -573,6 +590,32 @@ void PoolingLayer::calculateActivation()
 void PoolingLayer::calculateDelta()
 {
 
+}
+
+Matrix<float> PoolingLayer::getActivations() const
+{
+	const int height = pools[0]->getResult().getRows();
+	const int width  = pools[0]->getResult().getCols();
+	//Matrix<float> ret(pools.size()*height, width);
+
+	//for (int i = 0; i < pools.size(); ++i) {
+	//	for (int j = 0; j < width; ++j) {
+	//		for (int k = 0; k < height; ++k) {
+	//			ret(i*height + k, j) = pools[i]->getResult()(k, j);		//create a large matrix from all the small results
+	//		}
+	//	}
+	//}
+
+	Matrix<float> ret(pools.size()*height*width, 1);
+	for (int i = 0; i < pools.size(); ++i) {
+		for (int j = 0; j < height; ++j) {
+			for (int k = 0; k < width; ++k) {
+				ret(i*(height*width) + j*width + k, 0) = pools[i]->getResult()(j, k);
+			}
+		}
+	}
+
+	return ret;
 }
 
 nlohmann::json PoolingLayer::toJSON() const

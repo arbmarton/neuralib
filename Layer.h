@@ -14,6 +14,7 @@
 #include <random>
 
 // TODO: complete the feedforward cycle and test it
+	// featuremap: why do the convolution results vanish?
 
 // TODO: thourough JSON test, io with all the functions
 // TODO: implement softmax layer
@@ -218,7 +219,7 @@ public:
 	virtual void calculateActivation() override;
 	virtual void calculateDelta() override;
 
-	virtual Matrix<float> getActivations() const override { return Matrix<float>(); }
+	virtual Matrix<float> getActivations() const override;
 
 	nlohmann::json toJSON() const override;
 
