@@ -57,6 +57,11 @@ Matrix<float>& Pool::getResult()
 	return result;
 }
 
+std::vector<std::pair<int, int>>* Pool::getErrorLocations()
+{
+	return &errorLocations;
+}
+
 nlohmann::json Pool::toJSON() const
 {
 	nlohmann::json ret;

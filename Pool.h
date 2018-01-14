@@ -20,6 +20,7 @@ public:
 	int			   getWidth()  const;
 	int			   getHeight() const;
 	Matrix<float>& getResult();		// returns a reference because of the way the pooling is done
+	std::vector<std::pair<int, int>>* getErrorLocations();
 
 	nlohmann::json toJSON()   const;
 
@@ -34,7 +35,5 @@ private:
 	Matrix<float> result;
 	Matrix<float> delta;
 	std::vector<std::pair<int, int>> errorLocations;	// where to send the error back in the previous layer, matrix coordinates
-
-	PoolingLayer* parent;
 };
 

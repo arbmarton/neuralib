@@ -583,7 +583,12 @@ void PoolingLayer::calculateActivation()
 	}
 
 	for (int i = 0; i < pools.size(); ++i) {
-		createPool(method, previous->getMaps()[i], pools[i]);
+		if (method != PoolingMethod::max) {
+			createPool(method, previous->getMaps()[i], pools[i]);
+		}
+		else {
+			createPool(method, previous->getMaps()[i], pools[i], pools[i]->getErrorLocations());
+		}
 	}
 
 }
@@ -758,6 +763,8 @@ OutputLayer::OutputLayer(
 
 OutputLayer::OutputLayer(const nlohmann::json& input)
 	: Layer(input)
+	, correct(0)
+	, notCorrect(0)
 {
 	switch (str2int(input["costfunction"].get<std::string>().c_str()))
 	{

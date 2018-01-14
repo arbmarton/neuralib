@@ -225,29 +225,37 @@ void createPool(
 	const int& inputY,
 	T* result,
 	const int& resultX,
-	const int& resultY)
+	const int& resultY,
+	std::vector<std::pair<int,int>>* errorLocations = nullptr)
 {
 	for (int i = 0; i < resultX; ++i) {
 		for (int j = 0; j < resultY; ++j) {
 
 			T accum;
+			std::pair<int, int> tempPair;
 
 			switch (pooltype)
 			{
 			case PoolingMethod::max:
 
 				accum = std::numeric_limits<T>::min();
+				tempPair = std::make_pair(i*poolY, j*poolX);
 
-				for (int k = i*poolX; k < (i + 1)*poolX; ++k) {
-					for (int l = j*poolY; l < (j + 1)*poolY; ++l) {
+				for (int k = i*poolY; k < (i + 1)*poolY; ++k) {
+					for (int l = j*poolX; l < (j + 1)*poolX; ++l) {
 
-						T temp = input[k + l*inputX];
+						T temp = input[k*inputX + l];
+						
 
 						if (temp > accum) {
 							accum = temp;
+							tempPair.first  = k;
+							tempPair.second = l;
 						}
 					}
 				}
+
+				(*errorLocations)[j*resultX + i] = tempPair;
 
 				break;
 
@@ -296,12 +304,13 @@ void createPool(
 
 // if i inline it it wont compile, why?
 template<int T = 0>
-void createPool(const PoolingMethod& pooltype, FeatureMap* feat, Pool* pool)
+void createPool(const PoolingMethod& pooltype, FeatureMap* feat, Pool* pool, std::vector<std::pair<int,int>>* errorLocations = nullptr)
 {
 	createPool(
 		pooltype, pool->getWidth(), pool->getHeight(),
 		feat->getResult().getData(), feat->getResult().getCols(), feat->getResult().getRows(),
-		pool->getResult().getData(), pool->getResult().getCols(), pool->getResult().getRows()
+		pool->getResult().getData(), pool->getResult().getCols(), pool->getResult().getRows(),
+		errorLocations
 	);
 }
 
