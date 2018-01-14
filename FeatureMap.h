@@ -42,5 +42,6 @@ private:
 	Matrix<float>	kernelRotated;
 	Matrix<float>	result;  //maybe rename to activation?
 	Matrix<float>	delta;
+	Matrix<float>   costWeight;
 };
 

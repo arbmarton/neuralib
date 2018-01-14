@@ -6,6 +6,10 @@ Net::Net(NeuralInputClass* input, const CostFunction& cost, const Regularization
 	: inputClass(input)
 	, costFunctionType(cost)
 	, regularizationType(reg)
+	, epochs(0)
+	, minibatchSize(0)
+	, eta(0)
+	, regularization(0)
 {
 	input->init();
 }
@@ -16,6 +20,7 @@ Net::Net(const nlohmann::json& input)
 	, minibatchSize(input["minibatchsize"].get<int>())
 	, eta(input["eta"].get<float>())
 	, regularization(input["regularization"].get<float>())
+	, inputClass(nullptr)
 {
 	std::vector<nlohmann::json> layersJson = input["layers"].get<std::vector<nlohmann::json>>();
 	layers.resize(layersJson.size());

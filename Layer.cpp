@@ -171,6 +171,11 @@ Matrix<float> Layer::getBias() const
 	return biases;
 }
 
+Matrix<float> Layer::getWeights() const
+{
+	return weights;
+}
+
 Matrix<float> Layer::getZed() const
 {
 	return zed;
@@ -199,7 +204,7 @@ void Layer::calculateActivation()
 		//temp += biases;
 
 
-	}
+	}//
 	else {
 		temp = weights * dynamic_cast<PoolingLayer*>(prev)->getActivations();
 	}
@@ -212,7 +217,7 @@ void Layer::calculateActivation()
 		//neurons[i]->setResult(activations(i, 0));
 	}
 }
-//
+
 void Layer::calculateDelta()
 {
 	auto nextPtr = dynamic_cast<Layer*>(next);
@@ -468,6 +473,11 @@ void ConvolutionLayer::calculateDelta()
 	}
 }
 
+void ConvolutionLayer::calculateCostWeight()
+{
+
+}
+
 nlohmann::json ConvolutionLayer::toJSON() const
 {
 	nlohmann::json ret;
@@ -594,6 +604,26 @@ void PoolingLayer::calculateActivation()
 }
 
 void PoolingLayer::calculateDelta()
+{
+	//auto nextPtr = dynamic_cast<Layer*>(next);
+	//delta = hadamardProduct(
+	//	transpose(nextPtr->weights) * nextPtr->delta,
+	//	sigmoidDerivative(zed)
+	//);
+
+	auto nextPtr = dynamic_cast<Layer*>(next);
+
+	Matrix<float> bigDelta = hadamardProduct(
+		transpose(nextPtr->getWeights()) * nextPtr->getDelta(),
+		sigmoidDerivative(getActivations())
+	);
+
+	for (int i = 0; i < pools.size(); ++i) {
+		pools[i]->calculateDelta(nextPtr, bigDelta, i);
+	}
+}
+
+void PoolingLayer::calculateCostWeight()
 {
 
 }

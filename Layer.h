@@ -61,6 +61,7 @@ public:
 
 	virtual void calculateActivation() = 0;
 	virtual void calculateDelta() = 0;
+	virtual void calculateCostWeight() = 0;
 
 	virtual void printLayerInfo() const = 0;
 	virtual void printLayer() const = 0;
@@ -106,6 +107,7 @@ public:
 
 	virtual Matrix<float> getActivations() const override;
 	virtual Matrix<float> getBias()		   const;
+	virtual Matrix<float> getWeights()	   const;
 	virtual Matrix<float> getZed()		   const;
 	virtual Matrix<float> getDelta()	   const;
 	virtual Matrix<float> getCostBias()	   const;  // returns delta
@@ -113,7 +115,7 @@ public:
 
 	virtual void calculateActivation() override;
 	virtual void calculateDelta() override;
-	virtual void calculateCostWeight();
+	virtual void calculateCostWeight() override;
 	virtual void update(
 		const Regularization& regMethod,
 		const Matrix<float>&  weightUpdate,
@@ -172,6 +174,7 @@ public:
 
 	virtual void calculateActivation() override;
 	virtual void calculateDelta() override;
+	virtual void calculateCostWeight() override;
 
 	virtual Matrix<float> getActivations() const override { return Matrix<float>(); }
 
@@ -217,6 +220,7 @@ public:
 
 	virtual void calculateActivation() override;
 	virtual void calculateDelta() override;
+	virtual void calculateCostWeight() override;
 
 	virtual Matrix<float> getActivations() const override;
 

@@ -52,6 +52,9 @@ MNISTInputClass& MNISTInputClass::operator=(MNISTInputClass&& other)
 
 void MNISTInputClass::init()
 {
+	if (images) {
+		delete images;
+	}
 	images = new ImageHolder(totalImages);
 }
 

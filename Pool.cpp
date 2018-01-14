@@ -15,8 +15,9 @@ Pool::Pool(const PoolingMethod& _method, const int& kernelWidth, const int& kern
 	}
 	const int resultWidth = previousWidth / kernelWidth;
 
-	result = Matrix<float>(resultWidth, resultWidth);
-	delta = result;
+	result		= Matrix<float>(resultWidth, resultWidth);
+	delta		= result;
+	costWeight  = result;
 
 	errorLocations.resize(result.getSize());
 }
@@ -60,6 +61,17 @@ Matrix<float>& Pool::getResult()
 std::vector<std::pair<int, int>>* Pool::getErrorLocations()
 {
 	return &errorLocations;
+}
+
+// curr says to this object which Pool is it in the vector
+// we need to get the delta of this Pools from the delta of all the pools
+void Pool::calculateDelta(const LayerBase* next, const Matrix<float>& bigDelta, const int& curr)
+{
+	for (int i = 0; i < delta.getRows(); ++i) {
+		for (int j = 0; j < delta.getCols(); ++j) {
+			delta(i, j) = bigDelta(curr*delta.getSize() + i*delta.getCols() + j, 0);
+		}
+	}
 }
 
 nlohmann::json Pool::toJSON() const

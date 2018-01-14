@@ -13,6 +13,7 @@ FeatureMap::FeatureMap(
 	, kernelRotated(Matrix<float>(kernelHeight, kernelWidth))
 	, result(Matrix<float>(resultHeight, resultWidth))
 	, delta(Matrix<float>(resultHeight, resultWidth))
+	, costWeight(Matrix<float>(kernelHeight, kernelWidth))
 {
 	//const int prevActivations = _parent->getPreviousLayer()->getActivations().getRows();
 	//const int inputSide = sqrt(prevActivations);

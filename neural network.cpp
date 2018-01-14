@@ -63,7 +63,7 @@ int main()
 		Net conv(&input, CostFunction::CrossEntropy, Regularization::L2);
 		conv.createNewLayer(784, NeuronType::Input, LayerType::Input);
 		conv.createNewLayer(2,   LayerType::Convolutional, 5, 5);
-		conv.createNewLayer(2,   LayerType::Pooling, 2, 2, PoolingMethod::average);
+		conv.createNewLayer(2,   LayerType::Pooling, 2, 2, PoolingMethod::max);
 		conv.createNewLayer(100, NeuronType::Sigmoid, LayerType::General);
 		conv.createNewLayer(10,  NeuronType::Sigmoid, LayerType::Output);
 
