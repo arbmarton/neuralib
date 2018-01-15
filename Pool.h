@@ -21,6 +21,7 @@ public:
 	int			   getWidth()  const;
 	int			   getHeight() const;
 	Matrix<float>& getResult();		// returns a reference because of the way the pooling is done
+	Matrix<float>  getDelta() const;
 	std::vector<std::pair<int, int>>* getErrorLocations();
 
 	void calculateDelta(const LayerBase* next, const Matrix<float>& bigDelta, const int& curr);

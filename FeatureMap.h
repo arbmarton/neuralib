@@ -7,9 +7,9 @@
 
 #include <random>
 
+class LayerBase;
 class ConvolutionLayer;
 
-// TODO: parent useless?
 // TODO: get methods for the rotated kernel
 
 class FeatureMap
@@ -30,6 +30,8 @@ public:
 	float			getBias() const;
 
 	void applyBias();
+
+	void calculateDelta(LayerBase* next, const int& curr);
 
 	nlohmann::json toJSON()	   const;
 

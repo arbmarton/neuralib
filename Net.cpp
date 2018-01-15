@@ -234,6 +234,7 @@ void Net::testForward()
 	dynamic_cast<OutputLayer*>(getLastLayer())->resetCounters();
 
 	calculateActivationInAllLayers();
+	calculateDeltaInAllLayers();
 
 	printOutputLayer();
 }
@@ -319,7 +320,8 @@ void Net::calculateActivationInAllLayers() const
 void Net::calculateDeltaInAllLayers() const
 {
 	for (int i = layers.size() - 1; i >= 0; --i) {  // inputlayer wont do anything, we can include it
-		static_cast<Layer*>(layers[i])->calculateDelta();
+		//static_cast<Layer*>(layers[i])->calculateDelta();
+		layers[i]->calculateDelta();
 	}
 }
 

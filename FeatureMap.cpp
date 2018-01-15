@@ -67,6 +67,42 @@ void FeatureMap::applyBias()
 	result += bias;
 }
 
+void FeatureMap::calculateDelta(LayerBase* next, const int& curr)
+{
+	auto nextPtr = static_cast<PoolingLayer*>(next);
+	auto pool = nextPtr->getPools()[curr];
+	auto nextDelta = pool->getDelta();
+	auto method = nextPtr->getPoolingMethod();
+
+	const int width  = pool->getWidth();
+	const int height = pool->getHeight();
+
+	for (int i = 0; i < nextDelta.getRows(); ++i) {
+		for (int j = 0; j < nextDelta.getCols(); ++j) {
+
+			float unitDelta;
+
+			switch (method) {
+			case PoolingMethod::average:
+
+				unitDelta = nextDelta(i, j) / float(width*height);
+
+				for (int k = i*height; k < i*height + height; ++k) {
+					for (int l = j*width; l < j*width + width; ++l) {
+						delta(k, l) = unitDelta;
+					}
+				}
+
+				break;
+
+			default:
+				throw NeuralException("undefined poolingmethod");
+				break;
+			}
+		}
+	}
+}
+
 nlohmann::json FeatureMap::toJSON()   const
 {
 	nlohmann::json ret;

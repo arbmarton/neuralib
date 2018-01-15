@@ -467,9 +467,8 @@ void ConvolutionLayer::calculateActivation()
 
 void ConvolutionLayer::calculateDelta()
 {
-	auto nextPtr = next;
-	for (FeatureMap* feat : featureMaps) {
-		
+	for (int i = 0; i < featureMaps.size(); ++i) {
+		featureMaps[i]->calculateDelta(next, i);
 	}
 }
 
@@ -578,6 +577,11 @@ int PoolingLayer::getSize() const
 int PoolingLayer::getPoolRows() const
 {
 	return pools.size() * pools[0]->getResult().getRows();
+}
+
+PoolingMethod PoolingLayer::getPoolingMethod() const
+{
+	return method;
 }
 
 std::vector<Pool*>& PoolingLayer::getPools()

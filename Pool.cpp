@@ -58,6 +58,11 @@ Matrix<float>& Pool::getResult()
 	return result;
 }
 
+Matrix<float> Pool::getDelta() const
+{
+	return delta;
+}
+
 std::vector<std::pair<int, int>>* Pool::getErrorLocations()
 {
 	return &errorLocations;
