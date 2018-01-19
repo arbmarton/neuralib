@@ -13,7 +13,7 @@
 #include <vector>
 #include <random>
 
-// TODO: debug: why wont the deltas show up in the poolinglayer -> weights are zero in the fully connected layer
+// TODO: why is the second pool full of zeroes?
 
 // TODO: thourough JSON test, io with all the functions
 // TODO: implement softmax layer
@@ -216,6 +216,7 @@ public:
 
 	virtual int			getSize() const override;
 	int					getPoolRows() const;
+	int					getTotalElements() const;
 	PoolingMethod		getPoolingMethod() const;
 	std::vector<Pool*>& getPools();
 

@@ -84,12 +84,22 @@ Layer::Layer(
 		break;
 	}
 
-	if (newLayerType != LayerType::Input) {
-		init();
-	}
-
 	if (_prev) {
-		auto prevLayer = dynamic_cast<PoolingLayer*>(_prev);
+		if (dynamic_cast<PoolingLayer*>(_prev)) {
+			auto prevLayer = dynamic_cast<PoolingLayer*>(_prev);
+			weights = Matrix<float>(newSize, prevLayer->getTotalElements());
+			costWeight = Matrix<float>(newSize, prevLayer->getTotalElements());
+		}
+		else if (dynamic_cast<ConvolutionLayer*>(_prev)) {
+			auto prevLayer = dynamic_cast<ConvolutionLayer*>(_prev);
+			weights = Matrix<float>(newSize, prevLayer->getMapRows());
+			costWeight = Matrix<float>(newSize, prevLayer->getMapRows());
+		}
+		else {
+			weights = Matrix<float>(newSize, static_cast<Layer*>(_prev)->activations.getRows());
+			costWeight = Matrix<float>(newSize, static_cast<Layer*>(_prev)->activations.getRows());
+		}
+		/*auto prevLayer = dynamic_cast<PoolingLayer*>(_prev);
 		if (prevLayer) {
 			weights = Matrix<float>(newSize, prevLayer->getPoolRows());
 			costWeight = Matrix<float>(newSize, prevLayer->getPoolRows());
@@ -104,11 +114,15 @@ Layer::Layer(
 		}
 
 		weights = Matrix<float>(newSize, static_cast<Layer*>(_prev)->activations.getRows());
-		costWeight = Matrix<float>(newSize, static_cast<Layer*>(_prev)->activations.getRows());
+		costWeight = Matrix<float>(newSize, static_cast<Layer*>(_prev)->activations.getRows());*/
 	}
 	else {
 		weights = Matrix<float>(newSize, newSize);
 		costWeight = Matrix<float>(newSize, newSize);
+	}
+
+	if (newLayerType != LayerType::Input) {
+		init();
 	}
 }
 
@@ -577,6 +591,11 @@ int PoolingLayer::getSize() const
 int PoolingLayer::getPoolRows() const
 {
 	return pools.size() * pools[0]->getResult().getRows();
+}
+
+int PoolingLayer::getTotalElements() const
+{
+	return pools.size() * pools[0]->getResult().getRows() * pools[0]->getResult().getCols();
 }
 
 PoolingMethod PoolingLayer::getPoolingMethod() const
