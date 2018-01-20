@@ -264,7 +264,7 @@ void Net::train(
 
 		inputClass->shuffle();      // shuffle the images
 		inputClass->resetCounter(); // reset the curr counter in the imageholder
-		dynamic_cast<OutputLayer*>(getLastLayer())->resetCounters();  // reset the hit counter in the outputlayer
+		static_cast<OutputLayer*>(getLastLayer())->resetCounters();  // reset the hit counter in the outputlayer
 
 		for (int minibatch = 0; minibatch < minibatchNumber; ++minibatch) {
 
