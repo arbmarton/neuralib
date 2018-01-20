@@ -32,6 +32,7 @@ public:
 	void applyBias();
 
 	void calculateDelta(LayerBase* next, const int& curr);
+	void calculateCostWeight(LayerBase* prev);
 
 	nlohmann::json toJSON()	   const;
 
@@ -42,7 +43,7 @@ private:
 	float			bias;
 	Matrix<float>	kernel;
 	Matrix<float>	kernelRotated;
-	Matrix<float>	result;  //maybe rename to activation?
+	Matrix<float>	result;  // maybe rename to activation?
 	Matrix<float>	delta;
 	Matrix<float>   costWeight;
 };

@@ -95,26 +95,26 @@ public:
 	T*  getData() const { return data; }
 
 	T& operator()(const int& i, const int& j) { 
-		/*if (i < 0 || j < 0)
+		if (i < 0 || j < 0)
 			throw NeuralException("Matrix index lower than zero...");
 		if ((i + 1) > n || (j + 1) > m) 
-			throw NeuralException("Matrix index out of range...");*/
+			throw NeuralException("Matrix index out of range...");
 
 		return data[i*m + j];
 	}
 
 	T operator()(const int& i, const int& j) const {
-		/*if (i < 0 || j < 0)
+		if (i < 0 || j < 0)
 			throw NeuralException("Matrix index lower than zero...");
 		if ((i + 1) > n || (j + 1) > m)
-			throw NeuralException("Matrix index out of range...");*/
+			throw NeuralException("Matrix index out of range...");
 
 		return data[i*m + j];
 	}
 
 	Matrix& operator*=(const Matrix& rhs) {
-		/*if (m != rhs.n)
-			throw NeuralException("Matrix multiplication: incorrent matrix sizes...");*/
+		if (m != rhs.n)
+			throw NeuralException("Matrix multiplication: incorrent matrix sizes...");
 
 		Matrix temp(n, rhs.m);
 
@@ -161,8 +161,8 @@ public:
 	}
 
 	Matrix& operator+=(const Matrix& rhs) {
-		/*if (n != rhs.n || m != rhs.m)
-			throw NeuralException("Matrix dimension mismatch in addition...");*/
+		if (n != rhs.n || m != rhs.m)
+			throw NeuralException("Matrix dimension mismatch in addition...");
 
 		for (int i = 0; i < n; ++i) {
 			for (int j = 0; j < m; ++j) {
@@ -182,8 +182,8 @@ public:
 	}
 
 	Matrix& operator-=(const Matrix& rhs) {
-		/*if (n != rhs.n || m != rhs.m)
-			throw NeuralException("Matrix dimension mismatch in addition...");*/
+		if (n != rhs.n || m != rhs.m)
+			throw NeuralException("Matrix dimension mismatch in addition...");
 
 		for (int i = 0; i < n; ++i) {
 			for (int j = 0; j < m; ++j) {

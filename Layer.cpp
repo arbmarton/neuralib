@@ -243,8 +243,17 @@ void Layer::calculateDelta()
 
 void Layer::calculateCostWeight()
 {
-	auto prevPtr = dynamic_cast<Layer*>(prev);
-	costWeight = delta * transpose(prevPtr->activations);
+	if (dynamic_cast<Layer*>(prev)) {
+		auto prevPtr = dynamic_cast<Layer*>(prev);
+		costWeight = delta * transpose(prevPtr->activations);
+	}
+	else if (dynamic_cast<PoolingLayer*>(prev)) {
+		auto prevPtr = dynamic_cast<PoolingLayer*>(prev);
+		costWeight = delta * transpose(prevPtr->getActivations());
+	}
+	else {
+		throw NeuralException("\nunknown prevlayer in costweight calculation....\n");
+	}
 }
 
 void Layer::update(
@@ -488,7 +497,9 @@ void ConvolutionLayer::calculateDelta()
 
 void ConvolutionLayer::calculateCostWeight()
 {
-
+	for (int i = 0; i < featureMaps.size(); ++i) {
+		featureMaps[i]->calculateCostWeight(prev);
+	}
 }
 
 nlohmann::json ConvolutionLayer::toJSON() const
@@ -646,11 +657,6 @@ void PoolingLayer::calculateDelta()
 	}
 }
 
-void PoolingLayer::calculateCostWeight()
-{
-
-}
-
 Matrix<float> PoolingLayer::getActivations() const
 {
 	const int height = pools[0]->getResult().getRows();
@@ -762,6 +768,18 @@ InputLayer::InputLayer(const nlohmann::json& input)
 void InputLayer::setInputFunction(const std::function<void(std::vector<Neuron*>&)>& func)
 {
 	inputFunction = func;
+}
+
+Matrix<float> InputLayer::getSquareActivations() const
+{
+	const int sides = sqrt(activations.getRows());
+	Matrix<float> ret(sides, sides);
+	for (int i = 0; i < ret.getRows(); ++i) {
+		for (int j = 0; j < ret.getCols(); ++j) {
+			ret(i, j) = activations(i*ret.getCols() + j, 0);
+		}
+	}
+	return ret;
 }
 
 void InputLayer::calculateActivation()

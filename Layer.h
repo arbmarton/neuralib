@@ -222,7 +222,7 @@ public:
 
 	virtual void calculateActivation() override;
 	virtual void calculateDelta() override;
-	virtual void calculateCostWeight() override;
+	virtual void calculateCostWeight() override {}; // this does not need an implementation
 
 	virtual Matrix<float> getActivations() const override;
 
@@ -258,6 +258,8 @@ public:
 	InputLayer(const nlohmann::json& input);
 
 	void setInputFunction(const std::function<void(std::vector<Neuron*>&)>& func);
+
+	Matrix<float> getSquareActivations() const;
 
 	void calculateActivation() override;
 	void calculateDelta()      override {};

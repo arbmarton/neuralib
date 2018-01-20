@@ -235,6 +235,7 @@ void Net::testForward()
 
 	calculateActivationInAllLayers();
 	calculateDeltaInAllLayers();
+	calculateDerivativesInAllLayers();
 
 	printOutputLayer();
 }
@@ -327,8 +328,12 @@ void Net::calculateDeltaInAllLayers() const
 
 void Net::calculateDerivativesInAllLayers() const
 {
-	for (int i = layers.size() - 1; i >= 0; --i) {  // inputlayer wont do anything, we can include it
-		static_cast<Layer*>(layers[i])->calculateCostWeight();
+	//for (int i = layers.size() - 1; i >= 0; --i) {  // inputlayer wont do anything, we can include it
+	//	static_cast<Layer*>(layers[i])->calculateCostWeight();
+	//}
+
+	for (int i = layers.size() - 1; i >= 0; --i) {
+		layers[i]->calculateCostWeight();
 	}
 }
 

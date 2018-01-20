@@ -192,6 +192,16 @@ void validConvolution(const Matrix<T>& mat, FeatureMap* feat)
 	);
 }
 
+template<class T>
+void validConvolution(const Matrix<T>& input, const Matrix<T>& kernel, Matrix<T>& result)
+{
+	validConvolution(
+		input.getData(), input.getCols(), input.getRows(),
+		kernel.getData(), kernel.getCols(), kernel.getRows(),
+		result.getData(), result.getCols(), result.getRows()
+	);
+}
+
 // pad the input with zeroes and do a validconvolution
 template<class T>
 Matrix<T> fullConvolution(const Matrix<T>& kernel, const Matrix<T>& delta)

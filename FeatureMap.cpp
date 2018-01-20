@@ -103,6 +103,14 @@ void FeatureMap::calculateDelta(LayerBase* next, const int& curr)
 	}
 }
 
+// TODO: this wont work if the prev layer is not an InputLayer?
+void FeatureMap::calculateCostWeight(LayerBase* prev)
+{
+	Matrix<float> deltaRotated = delta.rotate180();
+	Matrix<float> squareActivations = static_cast<InputLayer*>(prev)->getSquareActivations();
+	validConvolution(squareActivations, deltaRotated, costWeight);
+}
+
 nlohmann::json FeatureMap::toJSON()   const
 {
 	nlohmann::json ret;
