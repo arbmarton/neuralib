@@ -9,6 +9,8 @@
 #include <thread>
 #include <iomanip>
 
+#define DEBUG_MODE
+
 template<class T>
 class Matrix
 {
@@ -95,26 +97,32 @@ public:
 	T*  getData() const { return data; }
 
 	T& operator()(const int& i, const int& j) { 
+		#ifdef DEBUG_MODE
 		if (i < 0 || j < 0)
 			throw NeuralException("Matrix index lower than zero...");
-		if ((i + 1) > n || (j + 1) > m) 
+		if ((i + 1) > n || (j + 1) > m)
 			throw NeuralException("Matrix index out of range...");
+		#endif // DEBUG_MODE
 
 		return data[i*m + j];
 	}
 
 	T operator()(const int& i, const int& j) const {
+		#ifdef DEBUG_MODE
 		if (i < 0 || j < 0)
 			throw NeuralException("Matrix index lower than zero...");
 		if ((i + 1) > n || (j + 1) > m)
 			throw NeuralException("Matrix index out of range...");
+		#endif // DEBUG_MODE
 
 		return data[i*m + j];
 	}
 
 	Matrix& operator*=(const Matrix& rhs) {
+		#ifdef DEBUG_MODE
 		if (m != rhs.n)
 			throw NeuralException("Matrix multiplication: incorrent matrix sizes...");
+		#endif // DEBUG_MODE
 
 		Matrix temp(n, rhs.m);
 
@@ -161,8 +169,10 @@ public:
 	}
 
 	Matrix& operator+=(const Matrix& rhs) {
+		#ifdef DEBUG_MODE
 		if (n != rhs.n || m != rhs.m)
 			throw NeuralException("Matrix dimension mismatch in addition...");
+		#endif // DEBUG_MODE
 
 		for (int i = 0; i < n; ++i) {
 			for (int j = 0; j < m; ++j) {
@@ -182,8 +192,10 @@ public:
 	}
 
 	Matrix& operator-=(const Matrix& rhs) {
+		#ifdef DEBUG_MODE
 		if (n != rhs.n || m != rhs.m)
 			throw NeuralException("Matrix dimension mismatch in addition...");
+		#endif // DEBUG_MODE
 
 		for (int i = 0; i < n; ++i) {
 			for (int j = 0; j < m; ++j) {
