@@ -27,9 +27,13 @@ public:
 
 	Matrix<float>&  getKernel();		// returns a reference because of the way the convolving is done
 	Matrix<float>&  getResult();		// returns a reference because of the way the convolving is done
+	Matrix<float>	getDelta() const;
+	Matrix<float>	getCostWeight() const;
 	float			getBias() const;
 
 	void applyBias();
+	void addToBias(const float& val);
+	void addToKernel(const Matrix<float>& mat);
 
 	void calculateDelta(LayerBase* next, const int& curr);
 	void calculateCostWeight(LayerBase* prev);

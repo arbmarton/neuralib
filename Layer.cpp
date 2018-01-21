@@ -502,6 +502,64 @@ void ConvolutionLayer::calculateCostWeight()
 	}
 }
 
+void ConvolutionLayer::update(
+	const Regularization& regMethod,
+	std::vector<std::pair<Matrix<float>, Matrix<float>>>& updateVector,
+	const float&		  multiplier,
+	const float&		  regularization,
+	const int&			  trainingSetSize)
+{
+	for (int i = 0; i < featureMaps.size(); ++i) {
+		switch (regMethod)
+		{
+		case Regularization::L1:
+
+			featureMaps[i]->addToKernel(
+				(
+					multiplier*updateVector[i].second - (regularization/trainingSetSize)*featureMaps[i]->getKernel().signum()
+				) * -1
+			);
+			featureMaps[i]->addToBias(
+				multiplier*updateVector[i].first.averageOfElements() * -1
+			);
+			//weights -= multiplier * weightUpdate - (regularization / trainingSetSize)*weights.signum();
+			//biases -= multiplier * biasUpdate;
+
+			break;
+
+		case Regularization::L2:
+
+			featureMaps[i]->addToKernel(
+				(
+					multiplier*updateVector[i].second - (regularization / trainingSetSize)*featureMaps[i]->getKernel()
+				) * -1
+			);
+			featureMaps[i]->addToBias(
+				multiplier*updateVector[i].first.averageOfElements() * -1
+			);
+			//weights -= multiplier * weightUpdate - (regularization / trainingSetSize)*weights;
+			//biases -= multiplier * biasUpdate;
+
+			break;
+
+		default:  // Regularization::None
+
+			featureMaps[i]->addToKernel(
+				(
+					multiplier*updateVector[i].second
+				) * -1
+			);
+			featureMaps[i]->addToBias(
+				multiplier*updateVector[i].first.averageOfElements() * -1
+			);
+			//weights -= multiplier * weightUpdate;
+			//biases -= multiplier * biasUpdate;
+
+			break;
+		}
+	}
+}
+
 nlohmann::json ConvolutionLayer::toJSON() const
 {
 	nlohmann::json ret;
@@ -772,7 +830,7 @@ void InputLayer::setInputFunction(const std::function<void(std::vector<Neuron*>&
 
 Matrix<float> InputLayer::getSquareActivations() const
 {
-	const int sides = sqrt(activations.getRows());
+	const int sides = int(sqrt(activations.getRows()));
 	Matrix<float> ret(sides, sides);
 	for (int i = 0; i < ret.getRows(); ++i) {
 		for (int j = 0; j < ret.getCols(); ++j) {

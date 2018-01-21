@@ -5,6 +5,7 @@
 #include "NeuralException.h"
 #include "NeuralInputClass.h"
 #include "NeuralMath.h"
+#include "NetworkUpdater.h"
 
 #include "json.hpp"
 
@@ -15,6 +16,7 @@
 
 //when constructing a net from json, the layers should be connected "manually"
 
+class NetworkUpdater;
 
 class Net
 {
@@ -40,10 +42,16 @@ public:
 	LayerBase* getLayer(const int& layerNumber) const;
 	LayerBase* getLayer(const LayerType& layerType) const;
 	LayerBase* getLastLayer() const;
+	int		   getLayerCount() const;
 
 	void addInputClass(NeuralInputClass* inputclass);
 
 	void testForward();
+	void testUpdater(
+		const int&        epochNumber,
+		const int&        minibatchSizeParam,
+		const float&      newEta,
+		const float&	  regularizationParam = 0);
 	void train(
 		const int&        epochNumber,
 		const int&        minibatchSizeParam,
@@ -60,6 +68,10 @@ public:
 	void updateWeightsAndBiases(
 		const std::vector<Matrix<float>>& weights,
 		const std::vector<Matrix<float>>& biases,
+		const float&					  multiplier,
+		const float&					  regularizationParam,
+		const int&						  trainingSetSize) const;
+	void updateWeightsAndBiases(
 		const float&					  multiplier,
 		const float&					  regularizationParam,
 		const int&						  trainingSetSize) const;
@@ -82,6 +94,7 @@ private:
 	CostFunction	  costFunctionType;
 	Regularization	  regularizationType;
 
+	NetworkUpdater*	  updater;
 	std::vector<LayerBase*> layers;
 
 	void connectLayers();

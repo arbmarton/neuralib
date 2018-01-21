@@ -330,6 +330,18 @@ public:
 		return temp;
 	}
 
+	float averageOfElements() const {
+		float ret = 0.0f;
+
+		for (int i = 0; i < n*m; ++i) {
+			ret += data[i];
+		}
+
+		ret /= float(n*m);
+
+		return ret;
+	}
+
 	void print() const {
 		std::cout << *this;
 	}

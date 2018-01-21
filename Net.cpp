@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Net.h"
 
+class NetworkUpdater::Updater;
+class NetworkUpdater::LayerUpdater;
 
 Net::Net(NeuralInputClass* input, const CostFunction& cost, const Regularization& reg)
 	: inputClass(input)
@@ -10,6 +12,7 @@ Net::Net(NeuralInputClass* input, const CostFunction& cost, const Regularization
 	, minibatchSize(0)
 	, eta(0)
 	, regularization(0)
+	, updater(nullptr)
 {
 	input->init();
 }
@@ -205,6 +208,11 @@ LayerBase* Net::getLastLayer() const
 	return layers[layers.size() - 1];
 }
 
+int Net::getLayerCount() const
+{
+	return layers.size();
+}
+
 void Net::addInputClass(NeuralInputClass* inputclass)
 {
 	inputClass = inputclass;
@@ -238,6 +246,64 @@ void Net::testForward()
 	calculateDerivativesInAllLayers();
 
 	printOutputLayer();
+}
+
+void Net::testUpdater(
+	const int&        epochNumber,
+	const int&        minibatchSizeParam,
+	const float&      newEta,
+	const float&	  regularizationParam)
+{
+	epochs = epochNumber;
+	minibatchSize = minibatchSizeParam;
+	eta = newEta;
+	regularization = regularizationParam;
+
+	if (updater) {
+		delete updater;
+	}
+	updater = new NetworkUpdater(this);
+
+	std::cout << "Starting calculations...\n";
+	printLayerInfo();
+
+	int minibatchNumber = inputClass->getTotalSize() / minibatchSize;
+
+	std::cout << "Network parameters:\nEpoch count: " << epochs
+		<< "\nMinibatch size: " << minibatchSize << "\nEta: " << eta << "\n\n";
+
+	for (int epochCounter = 0; epochCounter < epochs; ++epochCounter) {
+
+		inputClass->shuffle();      // shuffle the images
+		inputClass->resetCounter(); // reset the curr counter in the imageholder
+		static_cast<OutputLayer*>(getLastLayer())->resetCounters();  // reset the hit counter in the outputlayer
+
+		for (int minibatch = 0; minibatch < minibatchNumber; ++minibatch) {
+
+			updater->reset();
+
+			for (int minibatchCounter = 0; minibatchCounter < minibatchSize; ++minibatchCounter) {
+
+				calculateActivationInAllLayers();
+
+				calculateDeltaInAllLayers();
+				calculateDerivativesInAllLayers();
+
+				updater->addUpWeightsAndBiases();
+				//addUpWeightsAndBiases(weightUpdater, biasUpdater);
+			}
+
+			updateWeightsAndBiases(eta / float(minibatchSize), regularization, inputClass->getTotalSize());
+		}
+
+		std::cout << "After epoch number " << epochCounter + 1
+			<< ", the ratio is: " << static_cast<OutputLayer*>(getLastLayer())->getRatio() << '\n';
+	}
+
+	
+
+	delete updater;
+	updater = nullptr;
 }
 
 void Net::train(
@@ -274,7 +340,8 @@ void Net::train(
 			biasUpdater.resize(layers.size());
 
 			for (int i = 0; i < layers.size(); ++i) {
-				if (dynamic_cast<InputLayer*>(layers[i])) continue;
+				if (dynamic_cast<InputLayer*>(layers[i]) || dynamic_cast<OutputLayer*>(layers[i]))
+					continue;
 
 				weightUpdater[i] = Matrix<float>(layers[i]->getSize(), layers[i - 1]->getSize());
 				biasUpdater[i]   = Matrix<float>(layers[i]->getSize(), 1);
@@ -342,7 +409,7 @@ void Net::addUpWeightsAndBiases(
 	std::vector<Matrix<float>>& biases) const
 {
 	for (int i = 0; i < layers.size(); ++i) {
-		if (dynamic_cast<InputLayer*>(layers[i])) continue;
+		if (dynamic_cast<InputLayer*>(layers[i]) || dynamic_cast<OutputLayer*>(layers[i])) continue;
 
 		weights[i] += static_cast<Layer*>(layers[i])->getCostWeight();
 		biases[i]  += static_cast<Layer*>(layers[i])->getCostBias();
@@ -363,6 +430,43 @@ void Net::updateWeightsAndBiases(
 		static_cast<Layer*>(
 			layers[i])->update(regularizationType, weights[i], biases[i], multiplier, regularizationParam, trainingSetSize
 		);
+	}
+}
+
+void Net::updateWeightsAndBiases(
+	const float& multiplier,
+	const float& regularizationParam,
+	const int&   trainingSetSize) const
+{
+	if (!updater) {
+		throw NeuralException("exc");
+	}
+
+	for (int i = 0; i < layers.size(); ++i) {
+		if (dynamic_cast<InputLayer*>(layers[i]) || dynamic_cast<OutputLayer*>(layers[i]) || dynamic_cast<PoolingLayer*>(layers[i])) {
+			continue;
+		}
+
+		if (dynamic_cast<Layer*>(layers[i])) {
+			static_cast<Layer*>(layers[i])->update(
+				regularizationType,
+				updater->getMatrixLayerUpdater(i, false),
+				updater->getMatrixLayerUpdater(i, true),
+				multiplier,
+				regularizationParam,
+				trainingSetSize
+			);
+		}
+
+		else {
+			static_cast<ConvolutionLayer*>(layers[i])->update(
+				regularizationType,
+				updater->getVectorUpdaterConv(i),
+				multiplier,
+				regularizationParam,
+				trainingSetSize
+			);
+		}
 	}
 }
 
@@ -433,6 +537,7 @@ void Net::saveAs(const char* filename) const
 
 Net::~Net()
 {
+	delete updater;
 	for (int i = 0; i < layers.size(); ++i) {
 		delete layers[i];
 	}

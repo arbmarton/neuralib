@@ -13,7 +13,7 @@
 #include <vector>
 #include <random>
 
-// TODO: why is the second pool full of zeroes?
+// TODO: figure out a nice abstraction for updating the layers (not just conv.)
 
 // TODO: thourough JSON test, io with all the functions
 // TODO: implement softmax layer
@@ -175,6 +175,13 @@ public:
 	virtual void calculateActivation() override;
 	virtual void calculateDelta() override;
 	virtual void calculateCostWeight() override;
+	virtual void update(
+		const Regularization& regMethod,
+		std::vector<std::pair<Matrix<float>, Matrix<float>>>& updateVector,
+		const float&		  multiplier,
+		const float&		  regularization,
+		const int&			  trainingSetSize
+	);
 
 	virtual Matrix<float> getActivations() const override { return Matrix<float>(); }
 
@@ -274,7 +281,7 @@ public:
 
 	void printLayerInfo() const override;
 
-	~InputLayer();
+	virtual ~InputLayer();
 private:
 	std::function<void(std::vector<Neuron*>&)> inputFunction;
 };
@@ -313,7 +320,7 @@ public:
 
 	nlohmann::json toJSON() const override;
 
-	~OutputLayer();
+	virtual ~OutputLayer();
 private:
 	CostFunction costFunctionType;
 	std::function<void(std::vector<float>&)> idealOutputFunction;

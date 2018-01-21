@@ -57,6 +57,16 @@ Matrix<float>& FeatureMap::getResult()
 	return result;
 }
 
+Matrix<float> FeatureMap::getDelta() const
+{
+	return delta;
+}
+
+Matrix<float> FeatureMap::getCostWeight() const
+{
+	return costWeight;
+}
+
 float FeatureMap::getBias() const
 {
 	return bias;
@@ -65,6 +75,16 @@ float FeatureMap::getBias() const
 void FeatureMap::applyBias()
 {
 	result += bias;
+}
+
+void FeatureMap::addToBias(const float& val)
+{
+	bias += val;
+}
+
+void FeatureMap::addToKernel(const Matrix<float>& mat)
+{
+	kernel += mat;
 }
 
 void FeatureMap::calculateDelta(LayerBase* next, const int& curr)
