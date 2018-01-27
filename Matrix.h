@@ -9,7 +9,7 @@
 #include <thread>
 #include <iomanip>
 
-#define DEBUG_MODE
+//#define DEBUG_MODE
 
 template<class T>
 class Matrix
@@ -29,8 +29,10 @@ public:
 		, m(cols)
 		, data(new T[rows*cols])
 	{		
-		/*if (rows < 0 || cols < 0)
-			throw NeuralException("Matrix sizes cant be negative...");*/
+		#ifdef DEBUG_MODE
+		if (rows < 0 || cols < 0)
+			throw NeuralException("Matrix sizes cant be negative...");
+		#endif // DEBUG_MODE
 
 		memset(data, T(0), sizeof(T)*rows*cols);
 	}
@@ -253,9 +255,10 @@ public:
 	}
 
 	T getSquaredDifference(const Matrix<T>& cmp) {
-		/*if (n != cmp.n || m != cmp.m)
-			throw NeuralException("Invalid matrix sizes in squared difference calculation!");*/
-
+		#ifdef DEBUG_MODE
+		if (n != cmp.n || m != cmp.m)
+			throw NeuralException("Invalid matrix sizes in squared difference calculation!");
+		#endif // DEBUG_MODE
 		T accum = 0.0f;
 		for (int i = 0; i < n; ++i) {
 			for (int j = 0; j < m; ++j) {
@@ -267,9 +270,10 @@ public:
 	}
 
 	Matrix<T> getSquaredDifferenceMatrix(const Matrix<T>& cmp) {
-		/*if (n != cmp.n || m != cmp.m)
-			throw NeuralException("Invalid matrix sizes in squared difference calculation!");*/
-
+		#ifdef DEBUG_MODE
+		if (n != cmp.n || m != cmp.m)
+			throw NeuralException("Invalid matrix sizes in squared difference calculation!");
+		#endif // DEBUG_MODE
 		Matrix<T> ret(n, m);
 		for (int i = 0; i < n; ++i) {
 			for (int j = 0; j < m; ++j) {
@@ -281,8 +285,10 @@ public:
 	}
 
 	Matrix<T> getSquaredDifferenceMatrix(const std::vector<T>& cmp) {
-		/*if (n != cmp.size())
-			throw NeuralException("Invalid matrix sizes in squared difference (vector) calculation!");*/
+		#ifdef DEBUG_MODE
+		if (n != cmp.size())
+			throw NeuralException("Invalid matrix sizes in squared difference (vector) calculation!");
+		#endif // DEBUG_MODE
 
 		Matrix<T> ret(n, 1);
 		for (int i = 0; i < n; ++i) {
@@ -293,8 +299,10 @@ public:
 	}
 
 	int largestIndex() const {
-		/*if (m != 1)
-			throw NeuralException("Apply to column vectors only...");*/
+		#ifdef DEBUG_MODE
+		if (m != 1)
+			throw NeuralException("Apply to column vectors only...");
+		#endif // DEBUG_MODE
 
 		int ret = 0;
 		T largest = 0;
@@ -473,11 +481,13 @@ inline Matrix<U> operator*(const T& lhs, const Matrix<U>& rhs)
 template<class T>
 inline Matrix<T> hadamardProduct(const Matrix<T>& left, const Matrix<T>& right)
 {
-	/*if (left.getRows() != right.getRows() || left.getCols() != right.getCols())
+	#ifdef DEBUG_MODE
+	if (left.getRows() != right.getRows() || left.getCols() != right.getCols())
 		throw NeuralException("Matrix dimension mismatch in hadamard product...");
 
 	if (left.getCols() != 1)
-		throw NeuralException("Hadamard product can only be applied to column vectors...");*/
+		throw NeuralException("Hadamard product can only be applied to column vectors...");
+	#endif // DEBUG_MODE
 
 	Matrix<T> ret(left.getRows(), 1);
 	for (int i = 0; i < left.getRows(); ++i) {
