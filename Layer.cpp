@@ -339,48 +339,9 @@ nlohmann::json Layer::toJSON() const
 {
 	nlohmann::json ret;
 
-	ret["size"] = size;
-
-	switch (layertype)
-	{
-	case LayerType::Input:
-		ret["layertype"] = "input";
-		break;
-
-	case LayerType::General:
-		ret["layertype"] = "general";
-		break;
-
-	case LayerType::Output:
-		ret["layertype"] = "output";
-		break;
-
-	default:
-		ret["layertype"] = "unknown";
-		break;
-	}
-
-	switch (neurontype)
-	{
-	case NeuronType::Input:
-		ret["neurontype"] = "input";
-		break;
-
-	case NeuronType::Sigmoid:
-		ret["neurontype"] = "sigmoid";
-		break;
-
-	case NeuronType::Output:
-		ret["neurontype"] = "output";
-		break;
-
-	default:
-		ret["neurontype"] = "unknown";
-		break;
-	}
-	
-	//?? neurons?
-
+	ret["size"]		   = size;
+	ret["layertype"]   = layerTypeToString(layertype);
+	ret["neurontype"]  = neuronTypeToString(neurontype);
 	ret["activations"] = activations.toJSON();
 	ret["weights"]	   = weights.toJSON();
 	ret["biases"]      = biases.toJSON();
@@ -611,6 +572,7 @@ nlohmann::json ConvolutionLayer::toJSON() const
 {
 	nlohmann::json ret;
 
+	ret["input"]		= input.toJSON();
 	ret["kernelWidth"]  = kernelWidth;
 	ret["kernelHeight"] = kernelHeight;
 	ret["resultWidth"]  = resultWidth;
@@ -697,8 +659,7 @@ PoolingLayer::PoolingLayer(
 	const int& poolWidth,
 	const int& poolHeight,
 	ConvolutionLayer*   _prev,
-	LayerBase*			_next
-)
+	LayerBase*			_next)
 	: LayerBase(LayerType::Pooling, newSize, _prev, _next)
 	, method(_method)
 	, width(poolWidth)
