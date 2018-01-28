@@ -42,3 +42,59 @@ LayerType jsonToLayerType(const nlohmann::json& input)
 		break;
 	}
 }
+
+std::string layerTypeToString(const LayerType& layertype)
+{
+	switch (layertype)
+	{
+	case LayerType::Convolutional:
+		return std::string("convolutional");
+		break;
+
+	case LayerType::General:
+		return std::string("general");
+		break;
+
+	case LayerType::Input:
+		return std::string("input");
+		break;
+
+	case LayerType::Output:
+		return std::string("output");
+		break;
+
+	case LayerType::Pooling:
+		return std::string("pooling");
+		break;
+
+	default:
+		throw NeuralException("undefined layertype");
+		break;
+	}
+}
+
+std::string neuronTypeToString(const NeuronType& neurontype)
+{
+	switch (neurontype)
+	{
+	case NeuronType::Input:
+		return "input";
+		break;
+
+	case NeuronType::Output:
+		return "output";
+		break;
+
+	case NeuronType::Sigmoid:
+		return "sigmoid";
+		break;
+
+	case NeuronType::Softmax:
+		return "softmax";
+		break;
+
+	default:
+		throw NeuralException("undefined neurontype");
+		break;
+	}
+}
