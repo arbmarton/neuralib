@@ -38,7 +38,7 @@ public:
 	void calculateDelta(LayerBase* next, const int& curr);
 	void calculateCostWeight(LayerBase* prev);
 
-	nlohmann::json toJSON()	   const;
+	nlohmann::json toJSON()	const;
 
 	void print() const;
 

@@ -34,7 +34,10 @@ FeatureMap::FeatureMap(
 FeatureMap::FeatureMap(const nlohmann::json& other)
 	: bias(other["bias"].get<float>())
 	, kernel(other["kernel"].get<nlohmann::json>())
+	, kernelRotated(other["kernelrotated"].get<nlohmann::json>())
 	, result(other["result"].get<nlohmann::json>())
+	, delta(other["delta"].get<nlohmann::json>())
+	, costWeight(other["costWeight"].get<nlohmann::json>())
 {
 }
 
@@ -135,9 +138,12 @@ nlohmann::json FeatureMap::toJSON()   const
 {
 	nlohmann::json ret;
 
-	ret["bias"]   = bias;
-	ret["kernel"] = kernel.toJSON();
-	ret["result"] = result.toJSON();
+	ret["bias"]			 = bias;
+	ret["kernel"]		 = kernel.toJSON();
+	ret["kernelrotated"] = kernelRotated.toJSON();
+	ret["result"]		 = result.toJSON();
+	ret["delta"]		 = delta.toJSON();
+	ret["costweight"]	 = costWeight.toJSON();
 
 	return ret;
 }
