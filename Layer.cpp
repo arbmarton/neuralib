@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#define CPU_THREAD
 
 ////////////////////////////////////////////////////////////
 ///// LAYERBASE 
@@ -478,9 +479,23 @@ void ConvolutionLayer::calculateActivation()
 			input(i, j) = prev->getActivations()(i*input.getCols() + j, 0);
 		}
 	}
-	/*for (FeatureMap*& feat : featureMaps) {
-		validConvolution(input, *feat);
-	}*/
+
+#ifdef CPU_THREAD
+
+	std::vector<std::future<void>> fut;
+	fut.resize(ThreadPoolWrapper::getThreads());
+	for (int i = 0; i < fut.size(); ++i) {
+		fut[i] = ThreadPoolWrapper::getThreadPool().enqueue(
+			getActivationLambda(), this, input, i
+		);
+	}
+	for (int i = 0; i < fut.size(); ++i) {
+		fut[i].get();
+	}
+	return;
+
+#endif // CPU_THREAD
+
 
 	for (int i = 0; i < featureMaps.size(); ++i) {
 		validConvolution(input, featureMaps[i]);
@@ -490,6 +505,22 @@ void ConvolutionLayer::calculateActivation()
 
 void ConvolutionLayer::calculateDelta()
 {
+#ifdef CPU_THREAD
+
+	std::vector<std::future<void>> fut;
+	fut.resize(ThreadPoolWrapper::getThreads());
+	for (int i = 0; i < fut.size(); ++i) {
+		fut[i] = ThreadPoolWrapper::getThreadPool().enqueue(
+			getDeltaLambda(), this, i
+		);
+	}
+	for (int i = 0; i < fut.size(); ++i) {
+		fut[i].get();
+	}
+	return;
+
+#endif // CPU_THREAD
+
 	for (int i = 0; i < featureMaps.size(); ++i) {
 		featureMaps[i]->calculateDelta(next, i);
 	}
@@ -497,6 +528,22 @@ void ConvolutionLayer::calculateDelta()
 
 void ConvolutionLayer::calculateCostWeight()
 {
+#ifdef CPU_THREAD
+
+	std::vector<std::future<void>> fut;
+	fut.resize(ThreadPoolWrapper::getThreads());
+	for (int i = 0; i < fut.size(); ++i) {
+		fut[i] = ThreadPoolWrapper::getThreadPool().enqueue(
+			getCostWeightLambda(), this, i
+		);
+	}
+	for (int i = 0; i < fut.size(); ++i) {
+		fut[i].get();
+	}
+	return;
+
+#endif // CPU_THREAD
+
 	for (int i = 0; i < featureMaps.size(); ++i) {
 		featureMaps[i]->calculateCostWeight(prev);
 	}
@@ -604,6 +651,39 @@ ConvolutionLayer::~ConvolutionLayer()
 	for (int i = 0; i < size; ++i) {
 		delete featureMaps[i];
 	}
+}
+
+std::function<void(ConvolutionLayer* curr, const Matrix<float>& input, const int& threadID)> ConvolutionLayer::getActivationLambda() const
+{
+	auto lambda = [](ConvolutionLayer* curr, const Matrix<float>& input, const int& threadID) -> void {
+		for (int i = threadID; i < curr->getSize(); i += ThreadPoolWrapper::getThreads()) {
+			validConvolution(input, curr->getMaps()[i]);
+			curr->getMaps()[i]->applyBias();
+		}
+	};
+
+	return lambda;
+}
+
+std::function<void(ConvolutionLayer* curr, const int& threadID)> ConvolutionLayer::getDeltaLambda() const
+{
+	auto lambda = [](ConvolutionLayer* curr, const int& threadID) -> void {
+		for (int i = threadID; i < curr->getSize(); i += ThreadPoolWrapper::getThreads()) {
+			curr->getMaps()[i]->calculateDelta(curr->getNextLayer(), i);
+		}
+	};
+	return lambda;
+}
+
+std::function<void(ConvolutionLayer* curr, const int& threadID)> ConvolutionLayer::getCostWeightLambda() const
+{
+	auto lambda = [](ConvolutionLayer* curr, const int& threadID) -> void {
+		for (int i = threadID; i < curr->getSize(); i+=ThreadPoolWrapper::getThreads()) {
+			curr->getMaps()[i]->calculateCostWeight(curr->getPreviousLayer());
+		}
+	};
+
+	return lambda;
 }
 
 ////////////////////////////////////////////////////////////

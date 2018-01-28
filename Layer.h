@@ -7,13 +7,15 @@
 #include "FeatureMap.h"
 #include "Pool.h"
 #include "Utilities.h"
+#include "ThreadPool.h"
 
 #include "json.hpp"
 
 #include <vector>
 #include <random>
 
-// TODO: figure out a nice abstraction for updating the layers (not just conv.)
+// TODO: outputlayer update, figure out if im doing it wrong
+		// maybe update only the weights and biases set to 0?
 
 // TODO: thourough JSON test, io with all the functions
 // TODO: implement softmax layer
@@ -199,6 +201,10 @@ private:
 	int kernelHeight;
 	int resultWidth;
 	int resultHeight;
+
+	std::function<void(ConvolutionLayer* curr, const Matrix<float>& input, const int& threadID)> getActivationLambda() const;
+	std::function<void(ConvolutionLayer* curr, const int& threadID)> getDeltaLambda() const;
+	std::function<void(ConvolutionLayer* curr, const int& threadID)> getCostWeightLambda() const;
 };
 
 ////////////////////////////////////////////////////////////
