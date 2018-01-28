@@ -216,6 +216,7 @@ int Net::getLayerCount() const
 void Net::addInputClass(NeuralInputClass* inputclass)
 {
 	inputClass = inputclass;
+	inputClass->init();
 
 	static_cast<InputLayer*>(getLayer(LayerType::Input))->setInputFunction(inputclass->getInputFunction());
 	static_cast<OutputLayer*>(getLayer(LayerType::Output))->setIdealOutput(inputclass->getOutputFunction());
