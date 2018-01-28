@@ -340,7 +340,7 @@ void Net::train(
 			biasUpdater.resize(layers.size());
 
 			for (int i = 0; i < layers.size(); ++i) {
-				if (dynamic_cast<InputLayer*>(layers[i]) || dynamic_cast<OutputLayer*>(layers[i]))
+				if (dynamic_cast<InputLayer*>(layers[i]))
 					continue;
 
 				weightUpdater[i] = Matrix<float>(layers[i]->getSize(), layers[i - 1]->getSize());
@@ -409,7 +409,8 @@ void Net::addUpWeightsAndBiases(
 	std::vector<Matrix<float>>& biases) const
 {
 	for (int i = 0; i < layers.size(); ++i) {
-		if (dynamic_cast<InputLayer*>(layers[i]) || dynamic_cast<OutputLayer*>(layers[i])) continue;
+		if (dynamic_cast<InputLayer*>(layers[i])) 
+			continue;
 
 		weights[i] += static_cast<Layer*>(layers[i])->getCostWeight();
 		biases[i]  += static_cast<Layer*>(layers[i])->getCostBias();
@@ -426,7 +427,7 @@ void Net::updateWeightsAndBiases(
 	for (int i = 0; i < layers.size(); ++i) {
 		if (dynamic_cast<InputLayer*> (layers[i])) continue;
 		if (dynamic_cast<OutputLayer*>(layers[i])) continue;
-
+		
 		static_cast<Layer*>(
 			layers[i])->update(regularizationType, weights[i], biases[i], multiplier, regularizationParam, trainingSetSize
 		);
