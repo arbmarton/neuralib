@@ -9,9 +9,12 @@
 
 enum class PoolingMethod;
 enum class LayerType;
+enum class CostFunction;
 
 PoolingMethod jsonToPoolingMethod(const nlohmann::json& input);
 LayerType	  jsonToLayerType(const nlohmann::json& input);
 
 std::string	  layerTypeToString(const LayerType& layertype);
 std::string   neuronTypeToString(const NeuronType& neurontype);
+std::string	  poolingMethodToString(const PoolingMethod& poolingmethod);
+std::string   costfunctionTypeToString(const CostFunction& costfunctiontype);

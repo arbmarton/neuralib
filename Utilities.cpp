@@ -12,6 +12,9 @@ PoolingMethod jsonToPoolingMethod(const nlohmann::json& input)
 	case str2int("L2"):
 		return PoolingMethod::L2;
 
+	case str2int("average"):
+		return PoolingMethod::average;
+
 	default:
 		throw NeuralException("\nCant parse poolingmethod...\n");
 		break;
@@ -96,5 +99,39 @@ std::string neuronTypeToString(const NeuronType& neurontype)
 	default:
 		throw NeuralException("undefined neurontype");
 		break;
+	}
+}
+
+std::string poolingMethodToString(const PoolingMethod& poolingmethod)
+{
+	switch (poolingmethod)
+	{
+	case PoolingMethod::average:
+		return "average";
+
+	case PoolingMethod::L2:
+		return "L2";
+
+	case PoolingMethod::max:
+		return "max";
+
+	default:
+		throw NeuralException("unknown poolingmethod encountered");
+		break;
+	}
+}
+
+std::string costfunctionTypeToString(const CostFunction& costfunctiontype)
+{
+	switch (costfunctiontype)
+	{
+	case CostFunction::LeastSquares:
+		return "leastsquares";
+
+	case CostFunction::CrossEntropy:
+		return "crossentropy";
+
+	default:
+		throw NeuralException("unknown costfunctiontype");
 	}
 }

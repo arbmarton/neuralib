@@ -100,22 +100,6 @@ Layer::Layer(
 			weights = Matrix<float>(newSize, static_cast<Layer*>(_prev)->activations.getRows());
 			costWeight = Matrix<float>(newSize, static_cast<Layer*>(_prev)->activations.getRows());
 		}
-		/*auto prevLayer = dynamic_cast<PoolingLayer*>(_prev);
-		if (prevLayer) {
-			weights = Matrix<float>(newSize, prevLayer->getPoolRows());
-			costWeight = Matrix<float>(newSize, prevLayer->getPoolRows());
-			return;
-		}
-
-		auto prevLayer2 = dynamic_cast<ConvolutionLayer*>(_prev);
-		if (prevLayer2) {
-			weights = Matrix<float>(newSize, prevLayer2->getMapRows());
-			costWeight = Matrix<float>(newSize, prevLayer2->getMapRows());
-			return;
-		}
-
-		weights = Matrix<float>(newSize, static_cast<Layer*>(_prev)->activations.getRows());
-		costWeight = Matrix<float>(newSize, static_cast<Layer*>(_prev)->activations.getRows());*/
 	}
 	else {
 		weights = Matrix<float>(newSize, newSize);
@@ -130,7 +114,7 @@ Layer::Layer(
 Layer::Layer(const nlohmann::json& input)
 	: LayerBase(jsonToLayerType(input), input["size"].get<int>())
 	, weights(input["weights"].get<nlohmann::json>())
-//	, activations(input["activations"].get<nlohmann::json>())
+	, activations(input["activations"].get<nlohmann::json>())
 	, biases(input["biases"].get<nlohmann::json>())
 	, zed(input["zed"].get<nlohmann::json>())
 	, delta(input["delta"].get<nlohmann::json>())
@@ -293,21 +277,10 @@ void Layer::update(
 void Layer::printLayerInfo() const
 {
 	std::string type("General");
-	std::string _neurontype;
-	switch (neurontype)
-	{
-
-	case NeuronType::Sigmoid:
-		_neurontype = "Sigmoid";
-		break;
-
-	default:
-		_neurontype = "undefined neurontype";
-		break;
-	}
+	std::string neurontypeString = neuronTypeToString(neurontype);
 	std::string size = std::to_string(neurons.size());
 
-	std::cout << "Layertype: " + type + "\nNeurontype: " + _neurontype + "\nLayersize: " + size << "\n\n";
+	std::cout << "Layertype: " + type + "\nNeurontype: " + neurontypeString + "\nLayersize: " + size << "\n\n";
 }
 
 void Layer::printLayer() const
@@ -375,8 +348,8 @@ ConvolutionLayer::ConvolutionLayer(
 	, kernelWidth(width)
 	, kernelHeight(height)
 {
-	if (dynamic_cast<InputLayer*>(_prev)) {
-		const int prevSize = sqrt(_prev->getActivations().getRows());
+	if (dynamic_cast<InputLayer*>(prev)) {
+		const int prevSize = sqrt(prev->getActivations().getRows());
 		input = Matrix<float>(prevSize, prevSize);
 	}
 	else {
@@ -384,7 +357,7 @@ ConvolutionLayer::ConvolutionLayer(
 		throw NeuralException("\ni didnt implement this yet\n");
 	}
 
-	resultWidth  = input.getCols() - kernelWidth  + 1;
+	resultWidth = input.getCols() - kernelWidth + 1;
 	resultHeight = input.getRows() - kernelHeight + 1;
 
 	featureMaps.resize(newSize);
@@ -416,6 +389,21 @@ void ConvolutionLayer::init()
 		featureMaps[i] = new FeatureMap(kernelWidth, kernelHeight, this);
 		featureMaps[i]->init();
 	}*/
+}
+
+void ConvolutionLayer::initInput()
+{
+	if (dynamic_cast<InputLayer*>(prev)) {
+		const int prevSize = sqrt(prev->getActivations().getRows());
+		input = Matrix<float>(prevSize, prevSize);
+	}
+	else {
+		// if we convolve from a general layer what should happen?
+		throw NeuralException("\ni didnt implement this yet\n");
+	}
+
+	resultWidth = input.getCols() - kernelWidth + 1;
+	resultHeight = input.getRows() - kernelHeight + 1;
 }
 
 int ConvolutionLayer::getSize() const
@@ -572,6 +560,7 @@ nlohmann::json ConvolutionLayer::toJSON() const
 {
 	nlohmann::json ret;
 
+	ret["layertype"]	= layerTypeToString(layertype);
 	ret["input"]		= input.toJSON();
 	ret["kernelWidth"]  = kernelWidth;
 	ret["kernelHeight"] = kernelHeight;
@@ -786,25 +775,10 @@ nlohmann::json PoolingLayer::toJSON() const
 {
 	nlohmann::json ret;
 
-	switch (method)
-	{
-	case PoolingMethod::max:
-
-		ret["method"] = "max";
-
-		break;
-	case PoolingMethod::L2:
-
-		ret["method"] = "L2";
-
-		break;
-	default:
-		throw NeuralException("\nUnknown poolingmethod encountered...\n");
-		break;
-	}
-
-	ret["width"]  = width;
-	ret["height"] = height;
+	ret["method"] = poolingMethodToString(method);
+	ret["layertype"] = layerTypeToString(layertype);
+	ret["width"]	 = width;
+	ret["height"]	 = height;
 
 	std::vector<nlohmann::json> poolsjson;
 	poolsjson.resize(pools.size());
@@ -813,6 +787,7 @@ nlohmann::json PoolingLayer::toJSON() const
 	}
 
 	ret["pools"] = poolsjson;
+	ret["size"]  = size; 
 
 	return ret;
 }
@@ -1029,81 +1004,20 @@ void OutputLayer::initBiases()
 void OutputLayer::printLayerInfo() const
 {
 	std::string type("Output");
-	std::string _neurontype;
-	switch (neurontype)
-	{
-
-	case NeuronType::Sigmoid:
-		_neurontype = "Sigmoid";
-		break;
-
-	default:
-		_neurontype = "undefined neurontype";
-		break;
-	}
+	std::string neurontypeString = neuronTypeToString(neurontype);
 	std::string size = std::to_string(neurons.size());
 
-	std::cout << "Layertype: " + type + "\nNeurontype: " + _neurontype + "\nLayersize: " + size << "\n\n";
+	std::cout << "Layertype: " + type + "\nNeurontype: " + neurontypeString + "\nLayersize: " + size << "\n\n";
 }
 
 nlohmann::json OutputLayer::toJSON() const
 {
 	nlohmann::json ret;
 
-	ret["size"] = size;
-
-	switch (layertype)
-	{
-	case LayerType::Input:
-		ret["layertype"] = "input";
-		break;
-
-	case LayerType::General:
-		ret["layertype"] = "general";
-		break;
-
-	case LayerType::Output:
-		ret["layertype"] = "output";
-		break;
-
-	default:
-		ret["layertype"] = "unknown";
-		break;
-	}
-
-	switch (neurontype)
-	{
-	case NeuronType::Input:
-		ret["neurontype"] = "input";
-		break;
-
-	case NeuronType::Sigmoid:
-		ret["neurontype"] = "sigmoid";
-		break;
-
-	case NeuronType::Output:
-		ret["neurontype"] = "output";
-		break;
-
-	default:
-		ret["neurontype"] = "unknown";
-		break;
-	}
-
-	switch (costFunctionType)
-	{
-	case CostFunction::LeastSquares:
-		ret["costfunction"] = "leastsquares";
-		break;
-
-	case CostFunction::CrossEntropy:
-		ret["costfunction"] = "crossentropy";
-		break;
-
-	default:
-		ret["costfunction"] = "unknown";
-		break;
-	}
+	ret["size"]			= size;
+	ret["layertype"]	= layerTypeToString(layertype);
+	ret["neurontype"]   = neuronTypeToString(neurontype);
+	ret["costfunction"] = costfunctionTypeToString(costFunctionType);
 
 	//?? neurons?
 

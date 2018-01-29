@@ -169,6 +169,7 @@ public:
 	ConvolutionLayer(const nlohmann::json& input);
 
 	virtual void init() override;
+	void initInput();		// this is used when constructing from JSON
 
 	virtual int getSize() const override;
 	int getMapRows() const;
@@ -202,6 +203,7 @@ private:
 	int resultWidth;
 	int resultHeight;
 
+	// these are used in threading
 	std::function<void(ConvolutionLayer* curr, const Matrix<float>& input, const int& threadID)> getActivationLambda() const;
 	std::function<void(ConvolutionLayer* curr, const int& threadID)> getDeltaLambda() const;
 	std::function<void(ConvolutionLayer* curr, const int& threadID)> getCostWeightLambda() const;

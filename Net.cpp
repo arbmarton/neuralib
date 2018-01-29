@@ -80,6 +80,12 @@ Net::Net(const nlohmann::json& input)
 	regularizationType = Regularization::None;
 
 	connectLayers();
+
+	for (int i = 0; i < layers.size(); ++i) {
+		if (dynamic_cast<ConvolutionLayer*>(layers[i])) {
+			static_cast<ConvolutionLayer*>(layers[i])->initInput();
+		}
+	}
 }
 
 void Net::createNewLayer(const int& size, const NeuronType& neuronType, const LayerType& layerType)

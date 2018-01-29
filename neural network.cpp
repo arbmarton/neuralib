@@ -60,37 +60,44 @@ int main()
 
 		//result.print();
 
-		//Net conv(&input, CostFunction::CrossEntropy, Regularization::L2);
-		//conv.createNewLayer(784, NeuronType::Input, LayerType::Input);
-		//conv.createNewLayer(2,   LayerType::Convolutional, 5, 5);
-		//conv.createNewLayer(2,   LayerType::Pooling, 2, 2, PoolingMethod::average);
-		//conv.createNewLayer(100, NeuronType::Sigmoid, LayerType::General);
-		//conv.createNewLayer(10,  NeuronType::Sigmoid, LayerType::Output);
+		Net conv(&input, CostFunction::CrossEntropy, Regularization::L2);
+		conv.createNewLayer(784, NeuronType::Input, LayerType::Input);
+		conv.createNewLayer(10,  LayerType::Convolutional, 5, 5);
+		conv.createNewLayer(10,  LayerType::Pooling, 2, 2, PoolingMethod::average);
+		conv.createNewLayer(100, NeuronType::Sigmoid, LayerType::General);
+		conv.createNewLayer(10,  NeuronType::Sigmoid, LayerType::Output);
 
-		//conv.printLayerInfo();
-		//conv.testUpdater(1,1,1);
-		//conv.testForward();
+		conv.printLayerInfo();
+		timer.createTimePoint("start");
+		conv.testUpdater(5, 10, 3.0f, 0.001f);
+		timer.createTimePoint("end");
+		timer.printTimeDifferenceSec("start", "end");
+		conv.saveAs("0128.json");
 
-
-		Net network(&input, CostFunction::CrossEntropy, Regularization::L1);
-		network.createNewLayer(784,  NeuronType::Input,   LayerType::Input );
-		network.createNewLayer(100,  NeuronType::Sigmoid, LayerType::General);
-		network.createNewLayer(10,   NeuronType::Sigmoid, LayerType::Output);
-
-		timer.createTimePoint("before");
-		//network.testForward();
-		network.testUpdater(10, 10, 5.0f, 0.001f);
-		//network.train(10, 10, 5.0f, 0.001f);
-		timer.createTimePoint("after");
-
-		timer.printTimeDifferenceSec("before", "after");
-		//network.saveAs("mnist2.json");
+		Net cpy(getJson("0128.json"));
+		cpy.addInputClass(&input);
+		cpy.testUpdater(5, 10, 3.0f, 0.001f);
 
 
-		//Net cpy(getJson("net.json"));
+		//Net network(&input, CostFunction::CrossEntropy, Regularization::L1);
+		//network.createNewLayer(784,  NeuronType::Input,   LayerType::Input );
+		//network.createNewLayer(100,  NeuronType::Sigmoid, LayerType::General);
+		//network.createNewLayer(10,   NeuronType::Sigmoid, LayerType::Output);
+
+		//timer.createTimePoint("before");
+		////network.testForward();
+		//network.testUpdater(10, 10, 5.0f, 0.001f);
+		////network.train(3, 10, 5.0f, 0.001f);
+		//timer.createTimePoint("after");
+
+		//timer.printTimeDifferenceSec("before", "after");
+		//network.saveAs("0128.json");
+
+
+		//Net cpy(getJson("0128.json"));
 		//cpy.addInputClass(&input);
-
-		//cpy.train(10, 10, 1.0f);
+		//cpy.testUpdater(10, 10, 5.0f, 0.001f);
+		//cpy.saveAs("0128.json");
 		
 
 		/*Net bitnet(&bit, CostFunction::CrossEntropy, Regularization::L2);

@@ -29,20 +29,7 @@ Pool::Pool(const nlohmann::json& input)
 	, delta(input["delta"].get<nlohmann::json>())
 	, costWeight(input["costweight"].get<nlohmann::json>())
 {
-	switch (str2int(input["method"].get<std::string>().c_str()))
-	{
-	case str2int("L2"):
-		method = PoolingMethod::L2;
-		break;
-
-	case str2int("max"):
-		method = PoolingMethod::max;
-		break;
-
-	default:
-		throw NeuralException("\nUnknown poolingmethod encountered....\n");
-		break;
-	}
+	method = jsonToPoolingMethod(input);
 
 	errorLocations.resize(result.getSize());
 }
@@ -87,29 +74,12 @@ nlohmann::json Pool::toJSON() const
 {
 	nlohmann::json ret;
 
+	ret["method"]		= poolingMethodToString(method);
 	ret["width"]		= width;
 	ret["height"]		= height;
 	ret["result"]		= result.toJSON();
 	ret["delta"]		= delta.toJSON();
 	ret["costweight"]   = costWeight.toJSON();
-
-	switch (method) {
-	case PoolingMethod::L2:
-
-		ret["method"] = "L2";
-
-		break;
-
-	case PoolingMethod::max:
-
-		ret["method"] = "max";
-
-		break;
-
-	default:
-		throw NeuralException("\nUnknown pooling method encountered...\n");
-		break;
-	}
 
 	return ret;
 }
