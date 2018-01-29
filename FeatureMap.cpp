@@ -37,7 +37,7 @@ FeatureMap::FeatureMap(const nlohmann::json& other)
 	, kernelRotated(other["kernelrotated"].get<nlohmann::json>())
 	, result(other["result"].get<nlohmann::json>())
 	, delta(other["delta"].get<nlohmann::json>())
-	, costWeight(other["costWeight"].get<nlohmann::json>())
+	, costWeight(other["costweight"].get<nlohmann::json>())
 {
 }
 
